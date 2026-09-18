@@ -1,0 +1,6 @@
+{
+  "name": "Shine in Peace Suno Prompt Generator",
+  "description": "An interactive companion and Harmonic Study Engine to explore music theory frameworks (Bartók axes, II-V-I jazz, Neo-Riemannian parsimony) and generate optimized Suno AI music prompts and lyrics for 'Shine in Peace'.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
