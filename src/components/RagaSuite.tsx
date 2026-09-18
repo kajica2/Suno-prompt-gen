@@ -40,6 +40,7 @@ export default function RagaSuite({
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [copiedStyleId, setCopiedStyleId] = useState<string | null>(null);
   const [copiedLyricsId, setCopiedLyricsId] = useState<string | null>(null);
+  const [copiedAllId, setCopiedAllId] = useState<string | null>(null);
 
   // Tanpura Drone Web Audio state
   const [isDronePlaying, setIsDronePlaying] = useState(false);
@@ -76,6 +77,26 @@ export default function RagaSuite({
       setCopiedLyricsId(id);
       setTimeout(() => setCopiedLyricsId(null), 2500);
     }
+  };
+
+  const handleCopyAll = (prompt: RagaPrompt) => {
+    const currentStyle = bypassRagaFilter ? prompt.filterSafeStyleText : prompt.rawStyleText;
+    const lines = [
+      `=== ${prompt.title.toUpperCase()} ===`,
+      `Raga: ${prompt.ragaName} | Tradition: ${prompt.tradition} (${prompt.timeOfDay})`,
+      `Ensemble: ${prompt.ensemble}`,
+      prompt.swaras ? `Swaras: Arohana [${prompt.swaras.arohana || "N/A"}] / Avarohana [${prompt.swaras.avarohana || "N/A"}]` : "",
+      `Tags: ${prompt.tags.join(", ")}`,
+      "",
+      "--- [STYLE] ---",
+      currentStyle,
+      "",
+      "--- [LYRICS / STRUCTURE] ---",
+      prompt.lyricsStructure
+    ].filter(Boolean);
+    navigator.clipboard.writeText(lines.join("\n"));
+    setCopiedAllId(prompt.id);
+    setTimeout(() => setCopiedAllId(null), 2500);
   };
 
   const handleLoadInStudio = (prompt: RagaPrompt) => {
@@ -439,6 +460,7 @@ export default function RagaSuite({
           const currentStyle = bypassRagaFilter ? prompt.filterSafeStyleText : prompt.rawStyleText;
           const isCopiedStyle = copiedStyleId === prompt.id;
           const isCopiedLyrics = copiedLyricsId === prompt.id;
+          const isCopiedAll = copiedAllId === prompt.id;
 
           return (
             <div
@@ -482,16 +504,41 @@ export default function RagaSuite({
                     </p>
                   </div>
 
-                  {/* Send to Studio Generator button */}
-                  <button
-                    type="button"
-                    onClick={() => handleLoadInStudio(prompt)}
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-mono font-medium transition-all shrink-0 cursor-pointer"
-                    title="Load this prompt into Prompt Studio generator"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Open in Studio</span>
-                  </button>
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyAll(prompt)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer border ${
+                        isCopiedAll
+                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                          : "bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-300"
+                      }`}
+                      title="Copy Style, Tags, and Lyrics all together"
+                    >
+                      {isCopiedAll ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Copied All!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy All &#123;Style, Tags, Lyrics&#125;</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleLoadInStudio(prompt)}
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-mono font-medium transition-all shrink-0 cursor-pointer"
+                      title="Load this prompt into Prompt Studio generator"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Open in Studio</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Swara Notes details if present */}
@@ -609,10 +656,22 @@ export default function RagaSuite({
               </div>
 
               {/* Card Footer Actions */}
-              <div className="p-4 sm:p-5 bg-stone-900/60 border-t border-white/5 flex items-center justify-between gap-3">
-                <div className="text-[11px] font-mono text-white/50">
-                  Acoustic character: <span className="text-amber-300">Unplugged & Microtonal</span>
-                </div>
+              <div className="p-4 sm:p-5 bg-stone-900/60 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleCopyAll(prompt)}
+                  className="flex items-center gap-1.5 text-xs font-mono text-amber-300 hover:text-amber-200 transition-colors cursor-pointer"
+                >
+                  {isCopiedAll ? (
+                    <span className="text-emerald-400 flex items-center gap-1 font-bold">
+                      <Check className="w-3.5 h-3.5" /> Copied &#123;Style, Tags, Lyrics&#125;
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1">
+                      <Copy className="w-3.5 h-3.5" /> Copy All &#123;Style, Tags, Lyrics&#125;
+                    </span>
+                  )}
+                </button>
 
                 <button
                   type="button"

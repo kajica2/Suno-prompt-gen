@@ -1,8 +1,8 @@
-import { Sparkles, Music, BookOpen, Sliders, Feather, Flame } from "lucide-react";
+import { Sparkles, Music, BookOpen, Sliders, Feather, Flame, Disc } from "lucide-react";
 
 interface HeaderProps {
-  currentView?: "studio" | "harmonic" | "debussy" | "raga";
-  onSelectView?: (view: "studio" | "harmonic" | "debussy" | "raga") => void;
+  currentView?: "studio" | "harmonic" | "debussy" | "raga" | "trumpet";
+  onSelectView?: (view: "studio" | "harmonic" | "debussy" | "raga" | "trumpet") => void;
 }
 
 export default function Header({ currentView = "studio", onSelectView }: HeaderProps) {
@@ -37,6 +37,22 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
             >
               <Sliders className="w-3.5 h-3.5" />
               <span>Prompt Studio</span>
+            </button>
+            <button
+              onClick={() => onSelectView("trumpet")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "trumpet"
+                  ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              <Disc className="w-3.5 h-3.5 text-amber-300" />
+              <span>Trumpet Suite</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "trumpet" ? "bg-stone-900 text-amber-300 font-bold" : "bg-amber-500/20 text-amber-300"
+              }`}>
+                10
+              </span>
             </button>
             <button
               onClick={() => onSelectView("raga")}

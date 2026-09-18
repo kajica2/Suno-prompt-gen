@@ -12,17 +12,38 @@ interface PresetCardProps {
 export default function PresetCard({ preset, onLoadConfig }: PresetCardProps) {
   const [copiedTags, setCopiedTags] = useState(false);
   const [copiedLyrics, setCopiedLyrics] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const copyText = (text: string, type: "tags" | "lyrics") => {
+  const copyText = (text: string, type: "tags" | "lyrics" | "all") => {
     navigator.clipboard.writeText(text);
     if (type === "tags") {
       setCopiedTags(true);
       setTimeout(() => setCopiedTags(false), 2000);
-    } else {
+    } else if (type === "lyrics") {
       setCopiedLyrics(true);
       setTimeout(() => setCopiedLyrics(false), 2000);
+    } else if (type === "all") {
+      setCopiedAll(true);
+      setTimeout(() => setCopiedAll(false), 2000);
     }
+  };
+
+  const copyAllPreset = () => {
+    const bundle = [
+      `=== ${preset.name.toUpperCase()} ===`,
+      `Genre: ${preset.config.genre} | Tempo: ${preset.config.tempo}`,
+      "",
+      "--- [STYLE / TAGS] ---",
+      preset.sampleResult.styleTags,
+      "",
+      "--- [PROMPT DESCRIPTION] ---",
+      preset.sampleResult.promptDescription,
+      "",
+      "--- [LYRICS / STRUCTURE] ---",
+      preset.sampleResult.lyrics
+    ].join("\n");
+    copyText(bundle, "all");
   };
 
   return (
@@ -73,10 +94,11 @@ export default function PresetCard({ preset, onLoadConfig }: PresetCardProps) {
       </div>
 
       {/* Card Footer / Action Bar */}
-      <div className="px-6 py-4 bg-white/[0.01] border-t border-white/5 flex items-center justify-between gap-3">
+      <div className="px-6 py-4 bg-white/[0.01] border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
         <button
+          type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-[11px] uppercase tracking-wider text-white/50 hover:text-white font-medium flex items-center gap-1 py-1 px-2.5 rounded-md hover:bg-white/5 transition-colors"
+          className="text-[11px] uppercase tracking-wider text-white/50 hover:text-white font-medium flex items-center gap-1 py-1 px-2.5 rounded-md hover:bg-white/5 transition-colors cursor-pointer"
         >
           {isExpanded ? (
             <>
@@ -89,13 +111,39 @@ export default function PresetCard({ preset, onLoadConfig }: PresetCardProps) {
           )}
         </button>
 
-        <button
-          onClick={() => onLoadConfig(preset)}
-          className="text-[10px] uppercase tracking-widest bg-white hover:bg-stone-200 text-black font-bold flex items-center gap-1.5 py-2 px-3 rounded-lg transition-all"
-        >
-          <Sliders className="w-3 h-3" />
-          Load Style
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={copyAllPreset}
+            className={`text-[10px] uppercase tracking-wider font-mono font-bold flex items-center gap-1.5 py-2 px-2.5 rounded-lg border transition-all cursor-pointer ${
+              copiedAll
+                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                : "bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30"
+            }`}
+            title="Copy Style, Tags, and Lyrics all together"
+          >
+            {copiedAll ? (
+              <>
+                <Check className="w-3 h-3 text-emerald-400" />
+                <span>Copied All!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3 h-3 text-amber-400" />
+                <span>Copy All &#123;Style, Tags, Lyrics&#125;</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onLoadConfig(preset)}
+            className="text-[10px] uppercase tracking-widest bg-white hover:bg-stone-200 text-black font-bold flex items-center gap-1.5 py-2 px-3 rounded-lg transition-all cursor-pointer"
+          >
+            <Sliders className="w-3 h-3" />
+            Load Style
+          </button>
+        </div>
       </div>
 
       {/* Expanded Details Section */}

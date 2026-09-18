@@ -1,6 +1,34 @@
 import { Preset } from "./types";
 import { DEBUSSY_PROMPTS } from "./data/debussyPrompts";
 import { RAGA_PROMPTS } from "./data/ragaPrompts";
+import { TRUMPET_PROMPTS } from "./data/trumpetPrompts";
+
+export const TRUMPET_PRESETS: Preset[] = TRUMPET_PROMPTS.map((p) => ({
+  id: p.id,
+  name: `Trumpet Fusion: ${p.title}`,
+  description: `${p.subtitle} (Liquid DnB • Microhouse • Raga)`,
+  config: {
+    subtheme: `${p.title} (Acoustic Jazz Trumpet Fusion)`,
+    genre: "Liquid Drum and Bass, Ambient Microhouse, Jazz Trumpet",
+    mood: `${p.acousticCharacter}, Contemplative Float, Unquantized`,
+    tempo: p.category === "Rhythmic & High-Energy" ? "Rolling Breakbeat (174 BPM)" : "Liquid Breakbeat Pulse (174 BPM / Rubato)",
+    vocalType: "Intimate rhythmic voice, restrained doubles, raga noon inflections",
+    instruments: `acoustic jazz trumpet (${p.tags[0]}), hand-played tabla, deep sub, microhouse clicks, submerged dub delay`,
+    structure: p.lyricsStructure
+  },
+  sampleResult: {
+    title: p.title,
+    styleTags: p.filterSafeStyleText.length <= 115 ? p.filterSafeStyleText : p.filterSafeStyleText.slice(0, 112).trim() + "...",
+    promptDescription: p.filterSafeStyleText,
+    lyrics: p.lyricsStructure,
+    tips: [
+      "Paste into Suno's Style box. Use filter-safe acoustic tags to prevent generic brass pads.",
+      "Paste bracketed tags into Suno's Lyrics box to direct trumpet solos and drops without verbal lyrics.",
+      "Add 'no autotune, no pop synth, no EDM drop, no quantized' to keep the organic pulse.",
+      "If Suno filters 'jazz trumpet', use: 'acoustic trumpet, Harmon mute, smoky, blue notes, breathy, behind the beat'."
+    ]
+  }
+}));
 
 export const RAGA_PRESETS: Preset[] = RAGA_PROMPTS.map((p) => ({
   id: p.id,
@@ -980,6 +1008,6 @@ We are living in a harmonic dream.`,
   }
 ];
 
-export const PRESETS: Preset[] = [...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
+export const PRESETS: Preset[] = [...TRUMPET_PRESETS, ...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
 
 

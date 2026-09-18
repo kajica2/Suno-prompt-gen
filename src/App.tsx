@@ -7,11 +7,12 @@ import PromptForm from "./components/PromptForm";
 import HarmonicStudyEngine from "./components/HarmonicStudyEngine";
 import DebussySuite from "./components/DebussySuite";
 import RagaSuite from "./components/RagaSuite";
-import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame } from "lucide-react";
+import TrumpetSuite from "./components/TrumpetSuite";
+import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame, Disc } from "lucide-react";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<"studio" | "harmonic" | "debussy" | "raga">("studio");
-  const [presetCategory, setPresetCategory] = useState<"all" | "raga" | "debussy" | "harmonic" | "other">("all");
+  const [currentView, setCurrentView] = useState<"studio" | "harmonic" | "debussy" | "raga" | "trumpet">("studio");
+  const [presetCategory, setPresetCategory] = useState<"all" | "trumpet" | "raga" | "debussy" | "harmonic" | "other">("all");
   const [config, setConfig] = useState<PromptConfig>(PRESETS[0].config);
   const [result, setResult] = useState<PromptResult | null>(PRESETS[0].sampleResult);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +23,7 @@ export default function App() {
   const [copiedTags, setCopiedTags] = useState(false);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedLyrics, setCopiedLyrics] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
 
   const handleLoadPreset = (preset: Preset) => {
     setConfig(preset.config);
@@ -57,7 +59,7 @@ export default function App() {
     }
   };
 
-  const copyToClipboard = (text: string, type: "tags" | "prompt" | "lyrics") => {
+  const copyToClipboard = (text: string, type: "tags" | "prompt" | "lyrics" | "all") => {
     navigator.clipboard.writeText(text);
     if (type === "tags") {
       setCopiedTags(true);
@@ -68,7 +70,28 @@ export default function App() {
     } else if (type === "lyrics") {
       setCopiedLyrics(true);
       setTimeout(() => setCopiedLyrics(false), 2000);
+    } else if (type === "all") {
+      setCopiedAll(true);
+      setTimeout(() => setCopiedAll(false), 2500);
     }
+  };
+
+  const handleCopyAll = () => {
+    if (!result) return;
+    const bundleText = [
+      `=== ${result.title.toUpperCase()} ===`,
+      "",
+      "--- [STYLE OF MUSIC / TAGS] ---",
+      result.styleTags,
+      "",
+      "--- [PROMPT DESCRIPTION] ---",
+      result.promptDescription,
+      "",
+      "--- [LYRICS / SECTION STRUCTURE] ---",
+      result.lyrics
+    ].join("\n");
+
+    copyToClipboard(bundleText, "all");
   };
 
   // Highlights structured brackets in Suno lyrics and parenthetical backing/translations
@@ -146,6 +169,17 @@ export default function App() {
               onSwitchToGenerator={() => setCurrentView("studio")}
             />
           </main>
+        ) : currentView === "trumpet" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <TrumpetSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
         ) : currentView === "raga" ? (
           <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
             <RagaSuite
@@ -170,8 +204,39 @@ export default function App() {
           </main>
         ) : (
           <>
-            {/* Featured Unplugged Suites Ribbons */}
-            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Featured Unplugged & Fusion Suites Ribbons */}
+            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Trumpet Fusion Suite Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-stone-900/90 to-stone-950 border border-amber-500/40 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 shrink-0">
+                    <Disc className="w-5 h-5 animate-spin" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Acoustic Trumpet Suite
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
+                        10 Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Liquid DnB, microhouse, raga-noon & Harmon-muted jazz trumpet.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("trumpet")}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Explore</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
               {/* Raga Suite Ribbon */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/15 via-stone-900/90 to-stone-950 border border-orange-500/30 flex items-center justify-between gap-3 shadow-xl">
                 <div className="flex items-center gap-3">
@@ -204,9 +269,9 @@ export default function App() {
               </div>
 
               {/* Debussy Suite Ribbon */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-stone-900/90 to-stone-950 border border-amber-500/30 flex items-center justify-between gap-3 shadow-xl">
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-teal-500/15 via-stone-900/90 to-stone-950 border border-teal-500/30 flex items-center justify-between gap-3 shadow-xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-300 shrink-0">
                     <Feather className="w-5 h-5" />
                   </div>
                   <div>
@@ -214,7 +279,7 @@ export default function App() {
                       <span className="text-sm font-serif font-bold text-white tracking-wide">
                         Debussy Impressionist Suite
                       </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-mono font-semibold">
                         10 Prompts
                       </span>
                     </div>
@@ -356,11 +421,36 @@ export default function App() {
                       </h2>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-                      <span className="text-[10px] uppercase tracking-widest text-white/40 font-mono">
-                        Ready to Copy to Suno
-                      </span>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={handleCopyAll}
+                        className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shadow-md ${
+                          copiedAll
+                            ? "bg-emerald-500 text-stone-950 shadow-emerald-500/25"
+                            : "bg-amber-500 hover:bg-amber-400 text-stone-950 shadow-amber-500/20 hover:scale-[1.02]"
+                        }`}
+                        title="Copy Style, Tags, and Lyrics all formatted in one click"
+                      >
+                        {copiedAll ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            <span>Copied All!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4" />
+                            <span>Copy All &#123;Style, Tags, Lyrics&#125;</span>
+                          </>
+                        )}
+                      </button>
+
+                      <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-white/10">
+                        <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                        <span className="text-[10px] uppercase tracking-widest text-white/40 font-mono">
+                          Ready for Suno
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -561,6 +651,41 @@ export default function App() {
                     </div>
                   )}
 
+                  {/* Quick Bottom Action Bar for Copy All */}
+                  <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 bg-stone-950/70 p-4 rounded-2xl border border-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-serif font-bold text-white">Full Prompt Package Ready</div>
+                        <div className="text-[11px] text-stone-400 font-light">Bundle includes Style Keywords, Description &amp; Lyric Suite</div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleCopyAll}
+                      className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shadow-md ${
+                        copiedAll
+                          ? "bg-emerald-500 text-stone-950"
+                          : "bg-amber-500 hover:bg-amber-400 text-stone-950"
+                      }`}
+                    >
+                      {copiedAll ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Copied All &#123;Style, Tags, Lyrics&#125;!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copy All &#123;Style, Tags, Lyrics&#125;</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center py-24 text-center">
@@ -600,6 +725,16 @@ export default function App() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setPresetCategory("trumpet")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "trumpet" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Disc className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Trumpet Fusion (10)</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setPresetCategory("raga")}
                   className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     presetCategory === "raga" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
@@ -632,6 +767,7 @@ export default function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               {PRESETS.filter((preset) => {
+                if (presetCategory === "trumpet") return preset.id.startsWith("trumpet");
                 if (presetCategory === "raga") return preset.id.startsWith("raga");
                 if (presetCategory === "debussy") return preset.id.startsWith("debussy");
                 if (presetCategory === "harmonic") return preset.id.startsWith("suno-vocal") || preset.id.startsWith("modal-jazz") || preset.id.startsWith("bartok");

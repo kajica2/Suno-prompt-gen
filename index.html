@@ -4,9 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Shine in Peace Suno Prompt Generator</title>
-    <meta name="description" content="An interactive companion with Suno AI prompt studios, acoustic suites for Debussy Impressionism and Indian Classical Ragas with Tanpura drone synthesizer, and the Harmonic Study Engine." />
+    <meta name="description" content="An interactive companion with Suno AI prompt studios, acoustic suites for Acoustic Jazz Trumpet Liquid DnB Fusion, Debussy Impressionism, Indian Classical Ragas, and the Harmonic Study Engine with Copy All features." />
     <meta property="og:title" content="Shine in Peace Suno Prompt Generator" />
-    <meta property="og:description" content="An interactive companion with Suno AI prompt studios, acoustic suites for Debussy Impressionism and Indian Classical Ragas with Tanpura drone synthesizer, and the Harmonic Study Engine." />
+    <meta property="og:description" content="An interactive companion with Suno AI prompt studios, acoustic suites for Acoustic Jazz Trumpet Liquid DnB Fusion, Debussy Impressionism, Indian Classical Ragas, and the Harmonic Study Engine with Copy All features." />
+    <script>
+      (function() {
+        try {
+          if (typeof window !== 'undefined' && 'fetch' in window) {
+            var nativeFetch = window.fetch.bind(window);
+            var activeFetch = nativeFetch;
+            var propDesc = {
+              get: function() {
+                return activeFetch;
+              },
+              set: function(fn) {
+                activeFetch = fn;
+              },
+              configurable: true,
+              enumerable: true
+            };
+            try {
+              Object.defineProperty(window, 'fetch', propDesc);
+            } catch (e1) {}
+            if (typeof Window !== 'undefined' && Window.prototype) {
+              try {
+                Object.defineProperty(Window.prototype, 'fetch', propDesc);
+              } catch (e2) {}
+            }
+          }
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

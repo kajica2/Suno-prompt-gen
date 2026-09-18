@@ -645,7 +645,20 @@ export default function HarmonicStudyEngine({ onApplyConfig, onSwitchToGenerator
               const isMedley = prompt.id === "combined-harmonic-medley";
               const activeLyrics = isInst ? "[Instrumental]" : prompt.lyrics;
               const activeLyricsCount = activeLyrics.length;
-              const fullBundle = `=== SUNO STYLE PROMPT (${prompt.characterCount} chars) ===\n${prompt.styleTags}\n\n=== SUNO LYRICS BOX (${activeLyricsCount} chars) ===\n${activeLyrics}`;
+              const fullBundle = [
+                `=== ${prompt.title.toUpperCase()} ===`,
+                `Framework: ${prompt.frameworkCategory} | BPM: ${prompt.bpm} | Vocal: ${prompt.vocalType}`,
+                `Tags: ${prompt.tags.join(", ")}`,
+                "",
+                "--- [STYLE / TAGS] ---",
+                prompt.styleTags,
+                "",
+                "--- [DESCRIPTION] ---",
+                prompt.description,
+                "",
+                "--- [LYRICS / STRUCTURE] ---",
+                activeLyrics
+              ].join("\n");
 
               return (
                 <div 
@@ -697,6 +710,29 @@ export default function HarmonicStudyEngine({ onApplyConfig, onSwitchToGenerator
                           Well under 3,000 max
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(fullBundle, `bundle-${prompt.id}`)}
+                        className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl font-mono text-xs font-bold transition-all border cursor-pointer ${
+                          copiedKey === `bundle-${prompt.id}`
+                            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                            : "bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-300"
+                        }`}
+                        title="Copy Style, Tags, and Lyrics all formatted together"
+                      >
+                        {copiedKey === `bundle-${prompt.id}` ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Copied All!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy All &#123;Style, Tags, Lyrics&#125;</span>
+                          </>
+                        )}
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => handleExportProgression(PROMPT_TO_FRAMEWORK_MAP[prompt.id] || "functional")}
@@ -837,17 +873,21 @@ export default function HarmonicStudyEngine({ onApplyConfig, onSwitchToGenerator
                           <button
                             type="button"
                             onClick={() => copyToClipboard(fullBundle, `bundle-${prompt.id}`)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300 text-xs font-mono transition-colors cursor-pointer"
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-mono transition-colors cursor-pointer ${
+                              copiedKey === `bundle-${prompt.id}`
+                                ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 font-bold"
+                                : "bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/20 text-amber-300"
+                            }`}
                           >
                             {copiedKey === `bundle-${prompt.id}` ? (
                               <>
                                 <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                <span className="text-emerald-300">Bundle Copied!</span>
+                                <span>Copied All!</span>
                               </>
                             ) : (
                               <>
                                 <Copy className="w-3.5 h-3.5" />
-                                <span>Copy Full Bundle</span>
+                                <span>Copy All &#123;Style, Tags, Lyrics&#125;</span>
                               </>
                             )}
                           </button>

@@ -1,6 +1,6 @@
 {
   "name": "Shine in Peace Suno Prompt Generator",
-  "description": "An interactive companion with Suno AI prompt studios, acoustic suites for Debussy Impressionism and Indian Classical Ragas with Tanpura drone synthesizer, and the Harmonic Study Engine.",
+  "description": "An interactive companion with Suno AI prompt studios, acoustic suites for Acoustic Jazz Trumpet Liquid DnB Fusion, Debussy Impressionism, Indian Classical Ragas, and the Harmonic Study Engine with Copy All features.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
