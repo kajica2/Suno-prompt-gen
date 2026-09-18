@@ -14,6 +14,8 @@ export interface PromptResult {
   title: string;
   lyrics: string;
   tips: string[];
+  isFallback?: boolean;
+  fallbackReason?: string;
 }
 
 export interface Preset {

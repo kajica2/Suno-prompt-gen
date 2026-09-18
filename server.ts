@@ -3,6 +3,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import { generateProceduralPrompt } from "./src/lib/proceduralPromptEngine";
 
 dotenv.config();
 
@@ -44,7 +45,14 @@ app.post("/api/generate-prompt", async (req, res) => {
       structure,
     } = req.body;
 
-    const ai = getGeminiClient();
+    let ai: GoogleGenAI | null = null;
+    try {
+      ai = getGeminiClient();
+    } catch (keyErr: any) {
+      console.warn("[Gemini API] API Key not configured or invalid, utilizing procedural harmonic engine:", keyErr.message);
+      const fallbackResult = generateProceduralPrompt(req.body, "Gemini API key not configured. Generated with built-in Harmonic Engine.");
+      return res.json(fallbackResult);
+    }
 
     const systemInstruction = `You are an expert AI music producer, songwriter, and Suno AI prompt engineer. 
 Your goal is to generate extremely high-quality style tags, prompts, and beautiful poetic lyrics optimized for Suno AI (v3 or v4).
@@ -87,12 +95,14 @@ Provide output in JSON matching the exact schema specified.
 - styleTags: strictly under 115 characters, highly relevant, comma-separated keywords.
 - lyrics: deep, evocative, structured with brackets, fully articulated, strictly up to a maximum of 3,000 characters (max 3000 chars limit).`;
 
-    // Multi-model resilience: primary model with fast lightweight fallbacks if 503/demand spikes occur
-    const candidateModels = ["gemini-3.8-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash"];
+    // Multi-model resilience: prioritize models with higher quota headroom, then lighter models, then 3.8
+    const candidateModels = ["gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
     let response: any = null;
     let lastError: any = null;
 
     for (const model of candidateModels) {
+      let isModelQuotaExhausted = false;
+
       for (let attempt = 1; attempt <= 2; attempt++) {
         try {
           response = await ai.models.generateContent({
@@ -137,17 +147,23 @@ Provide output in JSON matching the exact schema specified.
         } catch (err: any) {
           lastError = err;
           const status = err?.status || err?.code || err?.error?.code;
-          const msg = err?.message || "";
-          const isTransient = status === 503 || status === 429 || msg.includes("503") || msg.includes("high demand") || msg.includes("UNAVAILABLE") || msg.includes("RESOURCE_EXHAUSTED");
+          const msg = String(err?.message || "");
+          const isQuota = status === 429 || msg.includes("429") || msg.includes("quota") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("Quota exceeded");
+          const isServerBusy = status === 503 || msg.includes("503") || msg.includes("high demand") || msg.includes("UNAVAILABLE");
 
-          console.warn(`[Gemini API] Model ${model} attempt ${attempt} encountered ${isTransient ? "transient demand spike" : "error"}:`, msg);
+          console.warn(`[Gemini API] Model ${model} attempt ${attempt} encountered ${isQuota ? "quota limit" : isServerBusy ? "transient demand spike" : "error"}:`, msg.slice(0, 200));
 
-          if (isTransient && attempt < 2) {
-            // Short backoff before retrying this model
+          // If this specific model exceeded its quota, don't waste time retrying it 1s later. Switch models immediately!
+          if (isQuota) {
+            isModelQuotaExhausted = true;
+            break;
+          }
+
+          if (isServerBusy && attempt < 2) {
+            // Short backoff before retrying once
             await new Promise((resolve) => setTimeout(resolve, 1000));
             continue;
           }
-          // Move to next candidate model
           break;
         }
       }
@@ -155,14 +171,18 @@ Provide output in JSON matching the exact schema specified.
       if (response?.text) {
         break;
       }
+      if (isModelQuotaExhausted) {
+        continue;
+      }
     }
 
     if (!response?.text) {
-      const errMsg = lastError?.message || "";
-      if (errMsg.includes("503") || errMsg.includes("high demand") || errMsg.includes("UNAVAILABLE")) {
-        throw new Error("The AI model is experiencing high demand right now. Please wait a moment and try again.");
-      }
-      throw lastError || new Error("Failed to generate prompt from AI service.");
+      console.warn("[Gemini API] All candidate models encountered quota/availability limits. Seamlessly activating procedural Harmonic Engine fallback.");
+      const fallbackResult = generateProceduralPrompt(
+        req.body,
+        "AI free-tier rate limit active (resetting soon). Prompt composed with the built-in Harmonic Engine."
+      );
+      return res.json(fallbackResult);
     }
 
     const resultText = response.text;
@@ -170,23 +190,16 @@ Provide output in JSON matching the exact schema specified.
     res.json(data);
 
   } catch (error: any) {
-    console.error("Error generating prompt:", error);
-    let friendlyMessage = error?.message || "Failed to generate prompt";
+    console.error("Error generating prompt, falling back to procedural engine:", error);
     try {
-      // Check if message is a serialized JSON error from the API client
-      if (friendlyMessage.includes("{") && friendlyMessage.includes("message")) {
-        const jsonMatch = friendlyMessage.match(/\{.*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (parsed?.error?.message) {
-            friendlyMessage = parsed.error.message;
-          }
-        }
-      }
+      const fallbackResult = generateProceduralPrompt(
+        req.body,
+        "Generated with built-in Harmonic Engine."
+      );
+      res.json(fallbackResult);
     } catch {
-      // Keep original friendlyMessage
+      res.status(500).json({ error: "Failed to generate prompt. Please try again." });
     }
-    res.status(500).json({ error: friendlyMessage });
   }
 });
 

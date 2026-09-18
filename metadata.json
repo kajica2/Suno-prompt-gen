@@ -1,6 +1,6 @@
 {
   "name": "Shine in Peace Suno Prompt Generator",
-  "description": "An interactive companion and Harmonic Study Engine to explore music theory frameworks (Bartók axes, II-V-I jazz, Neo-Riemannian parsimony) and generate optimized Suno AI music prompts and lyrics for 'Shine in Peace'.",
+  "description": "An interactive companion with Suno AI prompt studios, acoustic suites for Debussy Impressionism and Indian Classical Ragas with Tanpura drone synthesizer, and the Harmonic Study Engine.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -5,10 +5,13 @@ import Header from "./components/Header";
 import PresetCard from "./components/PresetCard";
 import PromptForm from "./components/PromptForm";
 import HarmonicStudyEngine from "./components/HarmonicStudyEngine";
-import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw } from "lucide-react";
+import DebussySuite from "./components/DebussySuite";
+import RagaSuite from "./components/RagaSuite";
+import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame } from "lucide-react";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<"studio" | "harmonic">("studio");
+  const [currentView, setCurrentView] = useState<"studio" | "harmonic" | "debussy" | "raga">("studio");
+  const [presetCategory, setPresetCategory] = useState<"all" | "raga" | "debussy" | "harmonic" | "other">("all");
   const [config, setConfig] = useState<PromptConfig>(PRESETS[0].config);
   const [result, setResult] = useState<PromptResult | null>(PRESETS[0].sampleResult);
   const [isLoading, setIsLoading] = useState(false);
@@ -143,9 +146,96 @@ export default function App() {
               onSwitchToGenerator={() => setCurrentView("studio")}
             />
           </main>
+        ) : currentView === "raga" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <RagaSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
+        ) : currentView === "debussy" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <DebussySuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
         ) : (
           <>
-            <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
+            {/* Featured Unplugged Suites Ribbons */}
+            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Raga Suite Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/15 via-stone-900/90 to-stone-950 border border-orange-500/30 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-300 shrink-0">
+                    <Flame className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Indian Classical Raga Suite
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 font-mono font-semibold">
+                        10 Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Sitar, bansuri, sarod, khayal, tanpura drone & unquantized meend.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("raga")}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Explore</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Debussy Suite Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-stone-900/90 to-stone-950 border border-amber-500/30 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 shrink-0">
+                    <Feather className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Debussy Impressionist Suite
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
+                        10 Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Felt piano, whole-tone scales, wordless vocalise & room tone.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("debussy")}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Explore</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative z-10">
               
               {/* Column 1: Config Form (lg:col-span-5) */}
               <div className="lg:col-span-5 space-y-6">
@@ -251,9 +341,16 @@ export default function App() {
                   {/* Results Header block */}
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/5">
                     <div>
-                      <span className="text-[10px] uppercase tracking-widest text-amber-400 font-mono font-bold">
-                        Generated Masterpiece Title
-                      </span>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] uppercase tracking-widest text-amber-400 font-mono font-bold">
+                          Generated Masterpiece Title
+                        </span>
+                        {result.isFallback && (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono text-[9px] uppercase tracking-wider font-semibold">
+                            Harmonic Engine
+                          </span>
+                        )}
+                      </div>
                       <h2 className="font-serif text-3xl md:text-4xl italic font-medium text-white tracking-tight mt-1">
                         {result.title}
                       </h2>
@@ -266,6 +363,16 @@ export default function App() {
                       </span>
                     </div>
                   </div>
+
+                  {result.isFallback && (
+                    <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-2.5 text-xs text-amber-200/90 font-light">
+                      <Info className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-medium text-amber-300">Generated with built-in Harmonic Engine: </span>
+                        <span>{result.fallbackReason || "Gemini API rate limit active. Prompt and lyrics are fully composed and ready for Suno."}</span>
+                      </div>
+                    </div>
+                  )}
 
                   {/* SUNO STYLING KEYWORDS SECTION (MOST IMPORTANT FOR SUNO) */}
                   <div>
@@ -474,13 +581,62 @@ export default function App() {
         {/* Masterpiece Presets Shelf */}
         <section className="border-t border-white/5 bg-black/30 py-16 px-6 md:px-12 relative z-10">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center space-x-3 mb-8">
-              <div className="h-px w-10 bg-amber-500/40"></div>
-              <span className="text-[11px] uppercase tracking-[0.3em] gold-text font-bold">Curated Sound Presets</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div className="flex items-center space-x-3">
+                <div className="h-px w-10 bg-amber-500/40"></div>
+                <span className="text-[11px] uppercase tracking-[0.3em] gold-text font-bold">Curated Sound Presets</span>
+              </div>
+
+              {/* Preset category switcher */}
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-stone-950 border border-white/10 overflow-x-auto max-w-full text-xs font-mono">
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("all")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+                    presetCategory === "all" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  All ({PRESETS.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("raga")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "raga" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Flame className="w-3.5 h-3.5 text-orange-400" />
+                  <span>Raga Classical (10)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("debussy")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "debussy" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Feather className="w-3.5 h-3.5 text-teal-400" />
+                  <span>Debussy Unplugged (10)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("harmonic")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+                    presetCategory === "harmonic" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  Harmonic Traditions
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-              {PRESETS.map((preset) => (
+              {PRESETS.filter((preset) => {
+                if (presetCategory === "raga") return preset.id.startsWith("raga");
+                if (presetCategory === "debussy") return preset.id.startsWith("debussy");
+                if (presetCategory === "harmonic") return preset.id.startsWith("suno-vocal") || preset.id.startsWith("modal-jazz") || preset.id.startsWith("bartok");
+                return true;
+              }).map((preset) => (
                 <PresetCard
                   key={preset.id}
                   preset={preset}

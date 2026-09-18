@@ -1,6 +1,61 @@
 import { Preset } from "./types";
+import { DEBUSSY_PROMPTS } from "./data/debussyPrompts";
+import { RAGA_PROMPTS } from "./data/ragaPrompts";
 
-export const PRESETS: Preset[] = [
+export const RAGA_PRESETS: Preset[] = RAGA_PROMPTS.map((p) => ({
+  id: p.id,
+  name: `Raga: ${p.title}`,
+  description: `${p.ragaName} • ${p.ensemble} (${p.timeOfDay})`,
+  config: {
+    subtheme: `${p.title} (Indian Classical)`,
+    genre: `${p.tradition} Classical (${p.ensemble})`,
+    mood: `${p.mood}, Microtonal Meend, Unplugged`,
+    tempo: "Slow Alaap into Steady Gat (Unquantized Human Timing)",
+    vocalType: p.isVocalise ? "Wordless Classical Vocalise" : "Instrumental (No Vocals)",
+    instruments: p.tags.join(", "),
+    structure: p.isVocalise ? "Khayal / Thumri Flow" : "Raga Arch ([Alaap] - [Jor] - [Gat] - [Jhala])"
+  },
+  sampleResult: {
+    title: `${p.title}`,
+    styleTags: p.filterSafeStyleText.length <= 115 ? p.filterSafeStyleText : p.filterSafeStyleText.slice(0, 112).trim() + "...",
+    promptDescription: p.rawStyleText,
+    lyrics: p.lyricsStructure,
+    tips: [
+      "Paste into Suno's Style box. If 'raga' is filtered, use: 'Indian classical, modal, drone, microtonal bends, meend, gamak, ascending/descending, meditative'.",
+      "Always specify 'tabla only, no drum kit' to suppress Western snare/drum kits.",
+      p.isVocalise ? "Use '[Vocalise]' in the Lyrics box for wordless singing." : "Keep '[Instrumental]' at the top of the Lyrics box.",
+      "Acoustic realism: 'string noise, finger noise, skin noise, room tone, unquantized' produces natural chamber depth."
+    ]
+  }
+}));
+
+export const DEBUSSY_PRESETS: Preset[] = DEBUSSY_PROMPTS.map((p) => ({
+  id: p.id,
+  name: `Debussy: ${p.title}`,
+  description: `${p.subtitle} (${p.ensemble})`,
+  config: {
+    subtheme: `Impressionist ${p.title} (Debussy Sound)`,
+    genre: p.ensemble,
+    mood: "French Impressionist, Whole-Tone, Rubato, Unplugged",
+    tempo: "Rubato (Unquantized Human Timing Drift)",
+    vocalType: p.isVocalise ? "Wordless Mezzo-Soprano Vocalise" : "Instrumental (No Vocals)",
+    instruments: p.tags.join(", "),
+    structure: p.isVocalise ? "Vocalise Flow" : "Impressionist Arch ([Intro] - [Theme] - [Bridge] - [Outro])"
+  },
+  sampleResult: {
+    title: `${p.title} (Impressionist)`,
+    styleTags: p.filterSafeStyleText.length <= 115 ? p.filterSafeStyleText : p.filterSafeStyleText.slice(0, 112).trim() + "...",
+    promptDescription: p.rawStyleText,
+    lyrics: p.lyricsStructure,
+    tips: [
+      "Paste into Suno's Style box. If 'Debussy' is filtered, use: 'French Impressionist, early 20th century, whole-tone, parallel chords, pedal-heavy, rubato'.",
+      p.isVocalise ? "For wordless vocals, use '[Vocalise]' in the Lyrics box." : "Put '[Instrumental]' at the top of the Lyrics box.",
+      "Keywords like 'room tone', 'pedal noise', 'unquantized', and 'breathy' create lifelike unplugged acoustic presence."
+    ]
+  }
+}));
+
+export const BASE_PRESETS: Preset[] = [
   {
     id: "liquid-dnb-serbian-raga",
     name: "Sijaj u Miru — Liquid DnB & Microhouse",
@@ -924,3 +979,7 @@ We are living in a harmonic dream.`,
     }
   }
 ];
+
+export const PRESETS: Preset[] = [...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
+
+

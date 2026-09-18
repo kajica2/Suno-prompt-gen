@@ -1,8 +1,8 @@
-import { Sparkles, Music, BookOpen, Sliders } from "lucide-react";
+import { Sparkles, Music, BookOpen, Sliders, Feather, Flame } from "lucide-react";
 
 interface HeaderProps {
-  currentView?: "studio" | "harmonic";
-  onSelectView?: (view: "studio" | "harmonic") => void;
+  currentView?: "studio" | "harmonic" | "debussy" | "raga";
+  onSelectView?: (view: "studio" | "harmonic" | "debussy" | "raga") => void;
 }
 
 export default function Header({ currentView = "studio", onSelectView }: HeaderProps) {
@@ -26,10 +26,10 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
 
         {/* View Switcher Pill */}
         {onSelectView && (
-          <div className="flex items-center p-1 rounded-xl bg-stone-950 border border-white/10 shadow-inner">
+          <div className="flex items-center p-1 rounded-xl bg-stone-950 border border-white/10 shadow-inner overflow-x-auto max-w-full">
             <button
               onClick={() => onSelectView("studio")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
                 currentView === "studio"
                   ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
                   : "text-white/60 hover:text-white"
@@ -39,15 +39,47 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
               <span>Prompt Studio</span>
             </button>
             <button
+              onClick={() => onSelectView("raga")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "raga"
+                  ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5 text-orange-400" />
+              <span>Raga Suite</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "raga" ? "bg-stone-900 text-amber-300 font-bold" : "bg-orange-500/20 text-orange-300"
+              }`}>
+                10
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("debussy")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "debussy"
+                  ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              <Feather className="w-3.5 h-3.5 text-teal-400" />
+              <span>Debussy Suite</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "debussy" ? "bg-stone-900 text-amber-300 font-bold" : "bg-amber-500/20 text-amber-300"
+              }`}>
+                10
+              </span>
+            </button>
+            <button
               onClick={() => onSelectView("harmonic")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
                 currentView === "harmonic"
                   ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
                   : "text-white/60 hover:text-white"
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>Harmonic Study Engine</span>
+              <span>Harmonic Engine</span>
             </button>
           </div>
         )}
