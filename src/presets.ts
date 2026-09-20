@@ -3,6 +3,38 @@ import { DEBUSSY_PROMPTS } from "./data/debussyPrompts";
 import { RAGA_PROMPTS } from "./data/ragaPrompts";
 import { TRUMPET_PROMPTS } from "./data/trumpetPrompts";
 import { BUSKING_PROMPTS } from "./data/buskingPrompts";
+import { BAMBAM_PROMPTS } from "./data/bambamPrompts";
+
+export const BAMBAM_PRESETS: Preset[] = BAMBAM_PROMPTS.map((p) => ({
+  id: `bambam-${p.id}`,
+  name: `Bam Bam Jamm #${p.number}: ${p.title}`,
+  description: `${p.focus} (${p.bpm} BPM · Healing Jamm)`,
+  config: {
+    subtheme: `Bam Bam Kolektiv (${p.title})`,
+    genre: p.genreFusion,
+    mood: "Ritual Tribal Sub-Bass & Acoustic Trumpet",
+    tempo: `${p.bpm} BPM, ${p.meter} Human Pocket`,
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: `acoustic trumpet, ${p.styleTags}`,
+    structure: p.tags.join(" "),
+    enableRoomTone: true,
+    roomTone: "natural room ambience",
+    negativePrompt: "no saxophone, no vocals, no guitar, no pop, no EDM drop",
+    appendExclusionsToStyle: true
+  },
+  sampleResult: {
+    title: `${p.number}. ${p.title} (Bam Bam Kolektiv)`,
+    styleTags: p.styleTags,
+    promptDescription: p.promptText,
+    lyrics: p.tags.join(" ") + `\n\n[Instrumental]\n[Trumpet Lead: ${p.trumpetRole}]\n[Exclusions: no vocals, no pop, no EDM drop, no autotune, no quantized]`,
+    negativePrompt: "no saxophone, no vocals, no guitar, no pop, no EDM drop",
+    tips: [
+      "Audio Influence: 70–85% with live drum reference loop.",
+      `Acoustic trumpet role: ${p.trumpetRole}`,
+      "Negative prompt: no saxophone, no vocals, no guitar, no pop, no EDM drop, no quantized, no autotune."
+    ]
+  }
+}));
 
 export const BUSKING_PRESETS: Preset[] = BUSKING_PROMPTS.map((p) => ({
   id: `busking-${p.id}`,
@@ -17,13 +49,16 @@ export const BUSKING_PRESETS: Preset[] = BUSKING_PROMPTS.map((p) => ({
     instruments: "percussive drums with brushes, deep electric bass, slap accents, hi-hat ghost notes",
     structure: p.tags.join(" "),
     enableRoomTone: true,
-    roomTone: "intimate jazz club noise"
+    roomTone: "intimate jazz club noise",
+    negativePrompt: "no saxophone, no vocals, no guitar, no spoken word",
+    appendExclusionsToStyle: true
   },
   sampleResult: {
     title: `${p.number}. ${p.title} (105 BPM)`,
     styleTags: p.styleTags,
     promptDescription: p.promptText,
     lyrics: p.tags.join(" ") + "\n\n[Instrumental]\n[No saxophone, no vocals, no guitar, no spoken word]\n[Leaves dynamic acoustic space for live trumpet or horn soloing]",
+    negativePrompt: "no saxophone, no vocals, no guitar, no spoken word",
     tips: [
       "Audio Influence: Set to 81% in Suno when uploading your reference audio loop.",
       "Room Tone: Natural ambient room acoustics combat AI artificial sheen.",
@@ -124,12 +159,17 @@ export const BASE_PRESETS: Preset[] = [
       tempo: "Weightless Rolling Breakbeat (174 BPM)",
       vocalType: "Intimate rhythmic Serbian vocal, restrained doubles, raga noon inflections",
       instruments: "hand-played tabla, deep sub bass, microhouse clicks, sparse ambient synths, submerged dub delay",
-      structure: "Atmospheric Liquid DnB (Intro-AtmosphericSwell-Verse-Chorus-Drop-Verse-Chorus-Bridge-Outro)"
+      structure: "Atmospheric Liquid DnB (Intro-AtmosphericSwell-Verse-Chorus-Drop-Verse-Chorus-Bridge-Outro)",
+      enableRoomTone: true,
+      roomTone: "natural room ambience",
+      negativePrompt: "no saxophone, no autotune, no EDM drop, no pop synth",
+      appendExclusionsToStyle: true
     },
     sampleResult: {
       title: "Sijaj u Miru (Shine in Peace)",
-      styleTags: "liquid dnb, microhouse clicks, tabla, deep sub, serbian vocal, raga inflections, dub delay, 174bpm",
+      styleTags: "liquid dnb, microhouse clicks, tabla, deep sub, serbian vocal, raga inflections, dub delay, 174bpm, no sax",
       promptDescription: "Liquid drum and bass meets ambient microhouse. Hand-played tabla over deep sub, rolling break, dub delay tails, and intimate rhythmic Serbian vocals with raga noon inflections.",
+      negativePrompt: "no saxophone, no autotune, no EDM drop, no pop synth",
       lyrics: `[Intro]
 [hand-played tabla rhythms over deep sub, delicate microhouse clicks, sparse ambient synth pads]
 [minimal immersive space, submerged dub delay tails]
@@ -1037,6 +1077,6 @@ We are living in a harmonic dream.`,
   }
 ];
 
-export const PRESETS: Preset[] = [...BUSKING_PRESETS, ...TRUMPET_PRESETS, ...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
+export const PRESETS: Preset[] = [...BAMBAM_PRESETS, ...BUSKING_PRESETS, ...TRUMPET_PRESETS, ...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
 
 

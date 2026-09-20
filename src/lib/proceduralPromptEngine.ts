@@ -16,6 +16,8 @@ export function generateProceduralPrompt(config: PromptConfig, reason?: string):
     structure = "Standard",
     enableRoomTone = false,
     roomTone = "natural room ambience",
+    negativePrompt = "",
+    appendExclusionsToStyle = true,
   } = config;
 
   const isInstrumental =
@@ -99,6 +101,21 @@ export function generateProceduralPrompt(config: PromptConfig, reason?: string):
     }
   }
 
+  // Append strict negative exclusions to styleTags if requested (respecting Suno's 120 char limit)
+  if (appendExclusionsToStyle !== false && negativePrompt.trim()) {
+    const cleanNeg = negativePrompt.trim();
+    if (`${styleTags}, ${cleanNeg}`.length <= 120) {
+      styleTags = `${styleTags}, ${cleanNeg}`;
+    } else {
+      const negParts = cleanNeg.split(",").map(p => p.trim()).filter(Boolean);
+      for (const p of negParts) {
+        if (`${styleTags}, ${p}`.length <= 120) {
+          styleTags = `${styleTags}, ${p}`;
+        }
+      }
+    }
+  }
+
   // 3. Compute Prompt Description (Evocative, <= 180 characters)
   let promptDescription = "";
   if (isDebussyOrImpressionist) {
@@ -109,6 +126,12 @@ export function generateProceduralPrompt(config: PromptConfig, reason?: string):
     promptDescription = `${mood} ${genre} meditation featuring ${instruments}. Organic acoustic presence, natural reverberation, and unhurried peaceful resolution. No percussion.`;
   } else {
     promptDescription = `${mood} ${genre} focusing on ${subtheme}. Features ${instruments}, ${vocalType}, and layered vocal harmonies invoking quiet healing and inner light.`;
+  }
+  if (negativePrompt.trim()) {
+    const excStr = ` (Exclusions: ${negativePrompt.trim()})`;
+    if (promptDescription.length + excStr.length <= 180) {
+      promptDescription += excStr;
+    }
   }
   if (promptDescription.length > 180) {
     promptDescription = promptDescription.slice(0, 177).trim() + "...";
@@ -227,6 +250,16 @@ Quiet in the light...
 Peace...`;
   }
 
+  // Append exclusions meta tag to lyrics if negative prompt exists
+  if (negativePrompt.trim()) {
+    const excHeader = `[Strict Exclusions: ${negativePrompt.trim()}]\n`;
+    if (lyrics.startsWith("[Instrumental]\n")) {
+      lyrics = lyrics.replace("[Instrumental]\n", `[Instrumental]\n${excHeader}`);
+    } else {
+      lyrics = `${excHeader}\n${lyrics}`;
+    }
+  }
+
   // 5. Suno Pro Tips
   const tips = isInstrumental
     ? [
@@ -240,6 +273,10 @@ Peace...`;
         "Keep style tags under 115 characters—Suno prioritizes the first 4-5 keywords and truncates or ignores excess tags."
       ];
 
+  if (negativePrompt.trim()) {
+    tips.unshift(`Strict Negative Exclusions active: "${negativePrompt.trim()}". Appended to style output to preserve acoustic trumpet and drum focus without saxophone or guitar clutter.`);
+  }
+
   return {
     title,
     styleTags,
@@ -247,6 +284,7 @@ Peace...`;
     lyrics,
     tips,
     isFallback: true,
-    fallbackReason: reason || "Gemini API free-tier quota rate limit reached. Auto-composed with the built-in Harmonic Engine so your creative flow is uninterrupted."
+    fallbackReason: reason || "Gemini API free-tier quota rate limit reached. Auto-composed with the built-in Harmonic Engine so your creative flow is uninterrupted.",
+    negativePrompt: negativePrompt.trim() || undefined
   };
 }

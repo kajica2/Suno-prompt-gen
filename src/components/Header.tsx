@@ -1,8 +1,8 @@
 import { Sparkles, Music, BookOpen, Sliders, Feather, Flame, Disc, Layers, Radio } from "lucide-react";
 
 interface HeaderProps {
-  currentView?: "protocols" | "studio" | "busking" | "trumpet" | "debussy" | "raga" | "harmonic";
-  onSelectView?: (view: "protocols" | "studio" | "busking" | "trumpet" | "debussy" | "raga" | "harmonic") => void;
+  currentView?: "protocols" | "studio" | "busking" | "bambam" | "trumpet" | "debussy" | "raga" | "harmonic";
+  onSelectView?: (view: "protocols" | "studio" | "busking" | "bambam" | "trumpet" | "debussy" | "raga" | "harmonic") => void;
 }
 
 export default function Header({ currentView = "studio", onSelectView }: HeaderProps) {
@@ -66,6 +66,22 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
               <span>Busking Tracks</span>
               <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
                 currentView === "busking" ? "bg-stone-900 text-amber-300 font-bold" : "bg-amber-500/20 text-amber-300"
+              }`}>
+                10
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("bambam")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "bambam"
+                  ? "bg-orange-500 text-stone-950 font-bold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              <Flame className="w-3.5 h-3.5 text-orange-400" />
+              <span>Bam Bam Jamm</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "bambam" ? "bg-stone-900 text-orange-300 font-bold" : "bg-orange-500/20 text-orange-300"
               }`}>
                 10
               </span>

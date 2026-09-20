@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PromptConfig } from "../types";
-import { Sliders, Sparkles, RefreshCw, HelpCircle, BookOpen, Volume2, ShieldCheck } from "lucide-react";
+import { Sliders, Sparkles, RefreshCw, HelpCircle, BookOpen, Volume2, ShieldCheck, Gauge, Ban, Check, Copy, RotateCcw } from "lucide-react";
 import { ROOM_TONE_OPTIONS } from "../data/buskingPrompts";
 
 interface PromptFormProps {
@@ -10,6 +10,40 @@ interface PromptFormProps {
   isLoading: boolean;
   onOpenHarmonicEngine?: () => void;
 }
+
+export const NEGATIVE_EXCLUSION_CHIPS = [
+  { id: "no-sax", tag: "no saxophone", label: "no saxophone", desc: "Prevents sax from stealing acoustic trumpet leads" },
+  { id: "no-vocals", tag: "no vocals", label: "no vocals", desc: "Forces pure instrumental arrangement" },
+  { id: "no-guitar", tag: "no guitar", label: "no guitar", desc: "Leaves acoustic headroom for trumpet & bass" },
+  { id: "no-synths", tag: "no synthesizer", label: "no synthesizer", desc: "Eliminates synthetic artificial pads" },
+  { id: "no-edm", tag: "no EDM drop", label: "no EDM drop", desc: "Avoids loud artificial beat drops" },
+  { id: "no-quantized", tag: "no quantized drums", label: "no quantized drums", desc: "Preserves natural human pocket timing" },
+  { id: "no-autotune", tag: "no autotune", label: "no autotune", desc: "Suppresses vocal processing artifacts" },
+  { id: "no-brass-sec", tag: "no brass section", label: "no brass section", desc: "Isolates solo acoustic trumpet instead of big band" },
+  { id: "no-piano", tag: "no piano", label: "no piano", desc: "Focuses strictly on horn and rhythm section" },
+  { id: "no-spoken", tag: "no spoken word", label: "no spoken word", desc: "Prevents AI verbal chatter over breaks" },
+];
+
+export const NEGATIVE_FOCUS_PRESETS = [
+  {
+    id: "trumpet-drum",
+    title: "Trumpet & Drum Focus",
+    tags: "no saxophone, no vocals, no guitar, no synthesizer",
+    description: "Centers solo acoustic trumpet and drum pocket without competing lead instruments."
+  },
+  {
+    id: "busking-pure",
+    title: "Busking Rhythm Pocket",
+    tags: "no saxophone, no vocals, no guitar, no spoken word",
+    description: "Clean rhythm foundation for live outdoor busking soloists."
+  },
+  {
+    id: "organic-anti-ai",
+    title: "Organic Acoustic Realism",
+    tags: "no vocals, no autotune, no EDM drop, no quantized drums",
+    description: "Anti-AI filter that preserves natural acoustic space."
+  }
+];
 
 const GENRE_SUGGESTIONS = [
   "Bartókian Modern Classical & Symmetrical Axes",
@@ -91,6 +125,29 @@ const STRUCTURE_SUGGESTIONS = [
 
 export default function PromptForm({ config, onChange, onSubmit, isLoading, onOpenHarmonicEngine }: PromptFormProps) {
   const [showInstrumentsTip, setShowInstrumentsTip] = useState(false);
+  const [copiedNegative, setCopiedNegative] = useState(false);
+
+  const currentExclusions = (config.negativePrompt || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+
+  const isChipActive = (tag: string) => currentExclusions.includes(tag.toLowerCase());
+
+  const toggleExclusionChip = (tag: string) => {
+    const normTag = tag.trim();
+    let nextList: string[];
+    if (isChipActive(normTag)) {
+      nextList = currentExclusions.filter((s) => s !== normTag.toLowerCase());
+    } else {
+      nextList = [...currentExclusions, normTag];
+    }
+    onChange({
+      ...config,
+      negativePrompt: nextList.join(", "),
+      appendExclusionsToStyle: config.appendExclusionsToStyle ?? true
+    });
+  };
 
   const handleFieldChange = (field: keyof PromptConfig, value: string) => {
     onChange({
@@ -255,20 +312,87 @@ export default function PromptForm({ config, onChange, onSubmit, isLoading, onOp
           </select>
         </div>
 
-        {/* Tempo / Pace */}
+        {/* Tempo / Pace with Visual BPM Slider */}
         <div>
-          <label className="block text-[10px] uppercase tracking-widest text-white/40 font-mono font-bold mb-1.5">
-            Tempo & Timing
-          </label>
-          <select
-            value={config.tempo}
-            onChange={(e) => handleFieldChange("tempo", e.target.value)}
-            className="w-full px-3 py-2 rounded-xl border border-white/10 text-sm focus:outline-none focus:border-amber-500/50 font-sans font-light bg-stone-900 text-white"
-          >
-            {TEMPO_SUGGESTIONS.map((t) => (
-              <option key={t} value={t} className="bg-stone-950">{t}</option>
-            ))}
-          </select>
+          {(() => {
+            const match = config.tempo.match(/\b(\d{2,3})\s*BPM\b/i) || config.tempo.match(/\((\d{2,3})\s*BPM\)/i) || config.tempo.match(/\b(\d{2,3})\b/);
+            const currentBpm = match ? parseInt(match[1], 10) : 105;
+
+            const updateBpm = (newBpm: number) => {
+              const bpmRegex = /\b\d{2,3}\s*BPM\b/i;
+              let newTempo = config.tempo;
+              if (bpmRegex.test(newTempo)) {
+                newTempo = newTempo.replace(bpmRegex, `${newBpm} BPM`);
+              } else if (/\(\d{2,3}-\d{2,3}\s*BPM\)/i.test(newTempo)) {
+                newTempo = newTempo.replace(/\(\d{2,3}-\d{2,3}\s*BPM\)/i, `(${newBpm} BPM)`);
+              } else {
+                newTempo = `${newBpm} BPM, ${newTempo}`;
+              }
+              handleFieldChange("tempo", newTempo);
+            };
+
+            return (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[10px] uppercase tracking-widest text-white/40 font-mono font-bold">
+                    Tempo & Timing
+                  </label>
+                  <div className="flex items-center gap-1.5 text-xs font-mono font-semibold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                    <Gauge className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{currentBpm} BPM</span>
+                  </div>
+                </div>
+
+                {/* Interactive BPM Slider */}
+                <div className="p-3 bg-stone-900/90 rounded-xl border border-white/10 space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-stone-400">
+                    <span>60 Ambient</span>
+                    <span>105 Busking</span>
+                    <span>128 Trance</span>
+                    <span>174 DnB</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={60}
+                    max={180}
+                    step={1}
+                    value={currentBpm}
+                    onChange={(e) => updateBpm(parseInt(e.target.value, 10))}
+                    className="w-full accent-amber-500 h-1.5 bg-stone-950 rounded-lg cursor-pointer"
+                  />
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {[72, 84, 100, 105, 112, 128, 140, 174].map((pBpm) => (
+                      <button
+                        key={pBpm}
+                        type="button"
+                        onClick={() => updateBpm(pBpm)}
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer border ${
+                          currentBpm === pBpm
+                            ? "bg-amber-500 text-stone-950 font-bold border-amber-400"
+                            : "bg-stone-950 text-stone-400 border-stone-800 hover:text-white"
+                        }`}
+                      >
+                        {pBpm}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <select
+                  value={config.tempo}
+                  onChange={(e) => handleFieldChange("tempo", e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-white/10 text-sm focus:outline-none focus:border-amber-500/50 font-sans font-light bg-stone-900 text-white"
+                >
+                  {TEMPO_SUGGESTIONS.map((t) => (
+                    <option key={t} value={t} className="bg-stone-950">{t}</option>
+                  ))}
+                  {!TEMPO_SUGGESTIONS.includes(config.tempo) && (
+                    <option value={config.tempo} className="bg-stone-950">{config.tempo}</option>
+                  )}
+                </select>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Song Structure */}
@@ -379,6 +503,174 @@ export default function PromptForm({ config, onChange, onSubmit, isLoading, onOp
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Negative Prompt & Strict Exclusions Control */}
+        <div className="pt-2 pb-1 border-t border-white/5">
+          <div className="p-4 rounded-xl bg-stone-900/80 border border-white/10 hover:border-rose-500/30 transition-all space-y-3.5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5">
+                <div className="p-1.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 shrink-0 mt-0.5">
+                  <Ban className="w-3.5 h-3.5 text-rose-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-medium text-white tracking-wide">
+                      Negative Prompt & Strict Exclusions
+                    </span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono font-semibold border border-rose-500/30">
+                      Trumpet & Drum Focus
+                    </span>
+                    {currentExclusions.length > 0 && (
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-stone-300 font-mono">
+                        {currentExclusions.length} active
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-stone-400 font-light mt-0.5 leading-relaxed">
+                    Appends strict negative exclusion parameters (<code className="text-rose-300/90 font-mono">no saxophone, no vocals, no guitar</code>) to the style output to ensure Suno focuses on the acoustic trumpet and drum pocket without instrument competition.
+                  </p>
+                </div>
+              </div>
+
+              {config.negativePrompt && (
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...config, negativePrompt: "" })}
+                  className="text-[10px] font-mono text-stone-400 hover:text-rose-300 transition-colors px-2 py-1 rounded hover:bg-white/5 cursor-pointer shrink-0 border border-transparent hover:border-white/10"
+                  title="Clear all negative exclusions"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* Quick Focus Combo Presets */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] uppercase tracking-wider text-white/50 font-mono font-bold">
+                  Quick Focus Combos
+                </span>
+                <span className="text-[10px] text-stone-500 font-mono">1-Click Apply</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                {NEGATIVE_FOCUS_PRESETS.map((preset) => {
+                  const isPresetActive = (config.negativePrompt || "")
+                    .toLowerCase()
+                    .includes("no saxophone") &&
+                    (config.negativePrompt || "").toLowerCase().includes("no guitar") &&
+                    preset.id === "trumpet-drum";
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => onChange({
+                        ...config,
+                        negativePrompt: preset.tags,
+                        appendExclusionsToStyle: config.appendExclusionsToStyle ?? true
+                      })}
+                      className={`px-2.5 py-2 rounded-lg text-left transition-all border cursor-pointer ${
+                        isPresetActive
+                          ? "bg-rose-500/20 border-rose-500/50 text-rose-200 shadow-sm shadow-rose-950/40"
+                          : "bg-black/30 border-white/5 text-stone-300 hover:border-white/20 hover:bg-white/5"
+                      }`}
+                    >
+                      <div className="text-xs font-medium text-white flex items-center justify-between">
+                        <span>{preset.title}</span>
+                        {isPresetActive && <span className="text-[10px] text-rose-400 font-bold">✓</span>}
+                      </div>
+                      <p className="text-[10px] text-stone-400 font-light mt-0.5 line-clamp-1 font-mono">
+                        {preset.tags}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Quick Toggle Exclusion Chips */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] uppercase tracking-wider text-white/50 font-mono font-bold block">
+                Toggle Specific Exclusions
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {NEGATIVE_EXCLUSION_CHIPS.map((chip) => {
+                  const active = isChipActive(chip.tag);
+                  return (
+                    <button
+                      key={chip.id}
+                      type="button"
+                      onClick={() => toggleExclusionChip(chip.tag)}
+                      title={chip.desc}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all border flex items-center gap-1.5 cursor-pointer ${
+                        active
+                          ? "bg-rose-500/20 border-rose-500/50 text-rose-200 font-medium shadow-sm shadow-rose-950/40"
+                          : "bg-black/30 border-white/5 text-stone-400 hover:text-stone-200 hover:border-white/15"
+                      }`}
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${active ? "bg-rose-400" : "bg-stone-600"}`} />
+                      <span>{chip.label}</span>
+                      {active && <span className="text-[10px] text-rose-400 font-bold">×</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Editable Negative Prompt Field */}
+            <div className="space-y-1.5">
+              <label className="block text-[10px] uppercase tracking-wider text-white/50 font-mono font-bold">
+                Exclusion Keywords (Comma-Separated)
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={config.negativePrompt || ""}
+                  onChange={(e) => onChange({
+                    ...config,
+                    negativePrompt: e.target.value,
+                    appendExclusionsToStyle: config.appendExclusionsToStyle ?? true
+                  })}
+                  placeholder="e.g. no saxophone, no vocals, no guitar"
+                  className="w-full px-3 py-2 rounded-xl border border-white/10 text-xs font-mono bg-stone-950 text-white placeholder-stone-600 focus:outline-none focus:border-rose-500/50 pr-20"
+                />
+                {config.negativePrompt && (
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(config.negativePrompt || "");
+                        setCopiedNegative(true);
+                        setTimeout(() => setCopiedNegative(false), 1500);
+                      }}
+                      className="px-2 py-0.5 text-[10px] font-mono text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 rounded transition-colors cursor-pointer"
+                      title="Copy negative prompt to clipboard"
+                    >
+                      {copiedNegative ? "Copied!" : "Copy"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Checkbox: Append to Style output */}
+            <div className="pt-1 flex items-center justify-between border-t border-white/5">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={config.appendExclusionsToStyle ?? true}
+                  onChange={(e) => onChange({ ...config, appendExclusionsToStyle: e.target.checked })}
+                  className="rounded border-white/20 bg-stone-950 text-rose-500 focus:ring-rose-500/30 accent-rose-500 cursor-pointer"
+                />
+                <span className="text-xs text-stone-300 font-light">
+                  Append exclusions directly to <strong className="text-white font-medium">Style of Music tags</strong>
+                </span>
+              </label>
+              <span className="text-[10px] font-mono text-stone-500">
+                Max 120 chars
+              </span>
+            </div>
           </div>
         </div>
 

@@ -8,6 +8,8 @@ export interface PromptConfig {
   structure: string;
   enableRoomTone?: boolean;
   roomTone?: string;
+  negativePrompt?: string;
+  appendExclusionsToStyle?: boolean;
 }
 
 export interface PromptResult {
@@ -18,6 +20,7 @@ export interface PromptResult {
   tips: string[];
   isFallback?: boolean;
   fallbackReason?: string;
+  negativePrompt?: string;
 }
 
 export interface Preset {

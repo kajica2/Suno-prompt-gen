@@ -10,11 +10,12 @@ import RagaSuite from "./components/RagaSuite";
 import TrumpetSuite from "./components/TrumpetSuite";
 import ProtocolsSuite from "./components/ProtocolsSuite";
 import BuskingSuite from "./components/BuskingSuite";
-import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame, Disc, Layers, Radio } from "lucide-react";
+import BamBamSuite from "./components/BamBamSuite";
+import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame, Disc, Layers, Radio, Ban } from "lucide-react";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<"protocols" | "studio" | "busking" | "harmonic" | "debussy" | "raga" | "trumpet">("protocols");
-  const [presetCategory, setPresetCategory] = useState<"all" | "busking" | "trumpet" | "raga" | "debussy" | "harmonic" | "other">("all");
+  const [currentView, setCurrentView] = useState<"protocols" | "studio" | "busking" | "bambam" | "harmonic" | "debussy" | "raga" | "trumpet">("protocols");
+  const [presetCategory, setPresetCategory] = useState<"all" | "bambam" | "busking" | "trumpet" | "raga" | "debussy" | "harmonic" | "other">("all");
   const [config, setConfig] = useState<PromptConfig>(PRESETS[0].config);
   const [result, setResult] = useState<PromptResult | null>(PRESETS[0].sampleResult);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +24,7 @@ export default function App() {
 
   // Clipboard copy feedbacks
   const [copiedTags, setCopiedTags] = useState(false);
+  const [copiedNegative, setCopiedNegative] = useState(false);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [copiedLyrics, setCopiedLyrics] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
@@ -61,11 +63,14 @@ export default function App() {
     }
   };
 
-  const copyToClipboard = (text: string, type: "tags" | "prompt" | "lyrics" | "all") => {
+  const copyToClipboard = (text: string, type: "tags" | "negative" | "prompt" | "lyrics" | "all") => {
     navigator.clipboard.writeText(text);
     if (type === "tags") {
       setCopiedTags(true);
       setTimeout(() => setCopiedTags(false), 2000);
+    } else if (type === "negative") {
+      setCopiedNegative(true);
+      setTimeout(() => setCopiedNegative(false), 2000);
     } else if (type === "prompt") {
       setCopiedPrompt(true);
       setTimeout(() => setCopiedPrompt(false), 2000);
@@ -80,12 +85,18 @@ export default function App() {
 
   const handleCopyAll = () => {
     if (!result) return;
+    const activeNegative = result.negativePrompt || config.negativePrompt;
     const bundleText = [
       `=== ${result.title.toUpperCase()} ===`,
       "",
       "--- [STYLE OF MUSIC / TAGS] ---",
       result.styleTags,
       "",
+      ...(activeNegative ? [
+        "--- [NEGATIVE PROMPT / EXCLUDE STYLES] ---",
+        activeNegative,
+        ""
+      ] : []),
       "--- [PROMPT DESCRIPTION] ---",
       result.promptDescription,
       "",
@@ -226,10 +237,51 @@ export default function App() {
               onSwitchToStudio={() => setCurrentView("studio")}
             />
           </main>
+        ) : currentView === "bambam" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <BamBamSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
         ) : (
           <>
             {/* Featured Unplugged & Fusion Suites Ribbons */}
-            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+              {/* Bam Bam Jamm Suite Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/20 via-stone-900/90 to-stone-950 border border-orange-500/40 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-300 shrink-0">
+                    <Flame className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Bam Bam Jamm
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 font-mono font-semibold">
+                        10 Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Tribal bass, ecstatic dance & acoustic trumpet solos (Audio Influence 70–85%).
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("bambam")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
               {/* Busking Backing Track Suite Ribbon */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-stone-900/90 to-stone-950 border border-amber-500/40 flex items-center justify-between gap-3 shadow-xl">
                 <div className="flex items-center gap-3">
@@ -599,6 +651,51 @@ export default function App() {
                     </p>
                   </div>
 
+                  {/* NEGATIVE EXCLUSIONS / SUNO EXCLUDE STYLES SECTION */}
+                  {(result.negativePrompt || config.negativePrompt) && (
+                    <div className="p-4 rounded-2xl bg-stone-950/80 border border-rose-500/20 space-y-2">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-2">
+                          <Ban className="w-3.5 h-3.5 text-rose-400" />
+                          <span className="text-xs font-mono uppercase tracking-widest text-rose-300 font-bold">
+                            Strict Negative Exclusions
+                          </span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-mono">
+                            Trumpet & Drum Focus
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(result.negativePrompt || config.negativePrompt || "", "negative")}
+                          className="text-xs text-rose-300/80 hover:text-rose-200 font-mono flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 transition-colors border border-rose-500/20 cursor-pointer"
+                        >
+                          {copiedNegative ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copy Exclusions</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <div className="p-3 bg-stone-900/90 rounded-xl border border-white/5">
+                        <p className="font-mono text-xs text-rose-200/90 leading-relaxed break-words">
+                          {result.negativePrompt || config.negativePrompt}
+                        </p>
+                      </div>
+
+                      <p className="text-[10px] text-stone-400 font-light leading-relaxed">
+                        💡 Paste into Suno's <strong className="text-rose-300 font-medium">Exclude Styles</strong> box (or let it auto-append to Style tags) to guarantee acoustic trumpet and drum focus without saxophone, vocals, or guitar clutter.
+                      </p>
+                    </div>
+                  )}
+
                   {/* PROMPT DESCRIPTION SECTION */}
                   <div>
                     <div className="flex items-center justify-between gap-4 mb-2">
@@ -814,6 +911,16 @@ export default function App() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setPresetCategory("bambam")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "bambam" ? "bg-orange-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Flame className="w-3.5 h-3.5 text-orange-400" />
+                  <span>Bam Bam Jamm (10)</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setPresetCategory("busking")}
                   className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     presetCategory === "busking" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
@@ -866,6 +973,7 @@ export default function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               {PRESETS.filter((preset) => {
+                if (presetCategory === "bambam") return preset.id.startsWith("bambam");
                 if (presetCategory === "busking") return preset.id.startsWith("busking");
                 if (presetCategory === "trumpet") return preset.id.startsWith("trumpet");
                 if (presetCategory === "raga") return preset.id.startsWith("raga");

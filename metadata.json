@@ -1,6 +1,6 @@
 {
   "name": "Shine in Peace Suno Prompt Generator",
-  "description": "An interactive companion featuring Suno prompt studios, 10 Jazz Fusion Busking Backing Tracks (Audio Influence 81%), organic Room Tone ambience generator, acoustic suites, and the DDSP ASMR acoustic trumpet instrumental protocols.",
+  "description": "An interactive companion featuring Suno prompt studios, 10 Bam Bam Kolektiv Tribal Bass & Acoustic Trumpet prompts (Audio Influence 70–85%), 10 Jazz Fusion Busking Backing Tracks, visual BPM slider, Negative Prompt strict exclusions control ('no saxophone, no vocals, no guitar'), organic Room Tone ambience generator, and DDSP ASMR acoustic trumpet protocols.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

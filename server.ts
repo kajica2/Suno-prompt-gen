@@ -46,7 +46,9 @@ app.post("/api/generate-prompt", async (req, res) => {
       instruments,
       structure,
       enableRoomTone,
-      roomTone
+      roomTone,
+      negativePrompt,
+      appendExclusionsToStyle
     } = req.body;
 
     let ai: GoogleGenAI | null = null;
@@ -86,6 +88,10 @@ Rules for lyrics and structure:
 - Suno AI has a strict MAXIMUM of 3,000 characters for the Lyrics prompt.
 - If Room Tone is requested or present:
   - You MUST include organic acoustic environmental descriptors like "captured in an wooden concert hall", "natural room ambience", or "intimate jazz club noise" into the styleTags and promptDescription to banish artificial AI shine and emphasize real acoustic physics.
+- If Negative Exclusions (negativePrompt) are specified (e.g. "no saxophone, no vocals, no guitar"):
+  - Strictly respect these exclusions: actively omit these elements and prioritize acoustic trumpet and drum focus.
+  - If requested, append negative exclusion tags like "no saxophone, no vocals, no guitar" to styleTags while strictly maintaining the total length under 120 characters.
+  - At the very top of the lyrics box, include bracketed exclusion tags like '[Strict Exclusions: no saxophone, no vocals, no guitar]' to strictly suppress those instruments in Suno.
 - Incorporate the theme of shining in peace / finding peace naturally and poignantly.`;
 
     const userPrompt = `Generate a Suno prompt suite for:
@@ -97,6 +103,7 @@ Rules for lyrics and structure:
 - Key Instrumentation: "${instruments || 'acoustic guitar, violin'}"
 - Arrangement Structure: "${structure || 'Standard'}"
 ${enableRoomTone ? `- Room Tone / Organic Environment: "${roomTone || 'natural room ambience'}" (CRITICAL: embed these environmental keywords into styleTags and promptDescription to guarantee a non-AI organic room sound)` : ''}
+${negativePrompt ? `- Strict Negative Exclusions: "${negativePrompt}" (CRITICAL: omit these elements, emphasize acoustic trumpet and drum focus, and append negative tags like "${negativePrompt}" to styleTags within the 120 character limit)` : ''}
 
 Provide output in JSON matching the exact schema specified.
 - styleTags: strictly under 115 characters, highly relevant, comma-separated keywords.
@@ -199,6 +206,28 @@ Provide output in JSON matching the exact schema specified.
       resultText = resultText.replace(/^```\s*/, "").replace(/\s*```$/, "");
     }
     const data = JSON.parse(resultText);
+
+    if (negativePrompt && typeof negativePrompt === "string" && negativePrompt.trim()) {
+      const cleanNeg = negativePrompt.trim();
+      data.negativePrompt = data.negativePrompt || cleanNeg;
+
+      if (appendExclusionsToStyle !== false) {
+        // If the styleTags does not already include the negative exclusions, append what fits within 120 chars
+        if (!data.styleTags.toLowerCase().includes("no ")) {
+          if (`${data.styleTags}, ${cleanNeg}`.length <= 120) {
+            data.styleTags = `${data.styleTags}, ${cleanNeg}`;
+          } else {
+            const parts = cleanNeg.split(",").map((p: string) => p.trim()).filter(Boolean);
+            for (const p of parts) {
+              if (`${data.styleTags}, ${p}`.length <= 120) {
+                data.styleTags = `${data.styleTags}, ${p}`;
+              }
+            }
+          }
+        }
+      }
+    }
+
     res.json(data);
 
   } catch (error: any) {
