@@ -109,83 +109,62 @@ Provide output in JSON matching the exact schema specified.
 - styleTags: strictly under 115 characters, highly relevant, comma-separated keywords.
 - lyrics: deep, evocative, structured with brackets, fully articulated, strictly up to a maximum of 3,000 characters (max 3000 chars limit).`;
 
-    // Multi-model resilience: prioritize models with higher quota headroom, then lighter models, then 3.8
-    const candidateModels = ["gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+    // Multi-model resilience: prioritize gemini-3.8-flash, then gemini-3.1-flash-lite
+    const candidateModels = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
     let response: any = null;
     let lastError: any = null;
 
     for (const model of candidateModels) {
-      let isModelQuotaExhausted = false;
-
-      for (let attempt = 1; attempt <= 2; attempt++) {
-        try {
-          response = await ai.models.generateContent({
-            model,
-            contents: userPrompt,
-            config: {
-              systemInstruction,
-              responseMimeType: "application/json",
-              responseSchema: {
-                type: Type.OBJECT,
-                properties: {
-                  styleTags: {
-                    type: Type.STRING,
-                    description: "Suno Style of Music tags: strictly comma-separated, under 115 characters. Example: 'ethereal indie folk, fingerstyle acoustic guitar, soft warm female vocals, slow, meditative'"
-                  },
-                  promptDescription: {
-                    type: Type.STRING,
-                    description: "A short, evocative musical description suitable for Suno prompt box, maximum 180 characters."
-                  },
-                  title: {
-                    type: Type.STRING,
-                    description: "A beautiful, evocative song title related to Shine in Peace."
-                  },
-                  lyrics: {
-                    type: Type.STRING,
-                    description: "Full poetic lyrics with structural tags like [Verse], [Chorus], [Bridge], [Outro]. Length strictly up to a maximum of 3,000 characters."
-                  },
-                  tips: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                    description: "3 brief, helpful tricks for Suno music generation using this style."
-                  }
+      try {
+        response = await ai.models.generateContent({
+          model,
+          contents: userPrompt,
+          config: {
+            systemInstruction,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                styleTags: {
+                  type: Type.STRING,
+                  description: "Suno Style of Music tags: strictly comma-separated, under 115 characters. Example: 'ethereal indie folk, fingerstyle acoustic guitar, soft warm female vocals, slow, meditative'"
                 },
-                required: ["styleTags", "promptDescription", "title", "lyrics", "tips"]
-              }
+                promptDescription: {
+                  type: Type.STRING,
+                  description: "A short, evocative musical description suitable for Suno prompt box, maximum 180 characters."
+                },
+                title: {
+                  type: Type.STRING,
+                  description: "A beautiful, evocative song title related to Shine in Peace."
+                },
+                lyrics: {
+                  type: Type.STRING,
+                  description: "Full poetic lyrics with structural tags like [Verse], [Chorus], [Bridge], [Outro]. Length strictly up to a maximum of 3,000 characters."
+                },
+                tips: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "3 brief, helpful tricks for Suno music generation using this style."
+                }
+              },
+              required: ["styleTags", "promptDescription", "title", "lyrics", "tips"]
             }
-          });
-
-          if (response?.text) {
-            break; // Successfully generated content
           }
-        } catch (err: any) {
-          lastError = err;
-          const status = err?.status || err?.code || err?.error?.code;
-          const msg = String(err?.message || "");
-          const isQuota = status === 429 || msg.includes("429") || msg.includes("quota") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("Quota exceeded");
-          const isServerBusy = status === 503 || msg.includes("503") || msg.includes("high demand") || msg.includes("UNAVAILABLE");
+        });
 
-          console.warn(`[Gemini API] Model ${model} attempt ${attempt} encountered ${isQuota ? "quota limit" : isServerBusy ? "transient demand spike" : "error"}:`, msg.slice(0, 200));
-
-          // If this specific model exceeded its quota, don't waste time retrying it 1s later. Switch models immediately!
-          if (isQuota) {
-            isModelQuotaExhausted = true;
-            break;
-          }
-
-          if (isServerBusy && attempt < 2) {
-            // Short backoff before retrying once
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-            continue;
-          }
-          break;
+        if (response?.text) {
+          break; // Successfully generated content
         }
-      }
+      } catch (err: any) {
+        lastError = err;
+        const status = err?.status || err?.code || err?.error?.code;
+        const msg = String(err?.message || "");
+        const isQuota = status === 429 || msg.includes("429") || msg.includes("quota") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("Quota exceeded");
+        const isServerBusy = status === 503 || msg.includes("503") || msg.includes("high demand") || msg.includes("UNAVAILABLE");
+        const isTimeout = status === 504 || msg.includes("504") || msg.includes("timed out") || msg.includes("DEADLINE_EXCEEDED");
 
-      if (response?.text) {
-        break;
-      }
-      if (isModelQuotaExhausted) {
+        console.warn(`[Gemini API] Model ${model} encountered ${isQuota ? "quota limit" : isServerBusy ? "transient demand spike" : isTimeout ? "timeout" : "error"}:`, msg.slice(0, 200));
+        // Continue to next candidate model immediately without waiting for timeouts
         continue;
       }
     }
@@ -290,7 +269,7 @@ Format output in valid JSON matching:
     const formattedHistory = history.map((h: any) => `${h.role === "user" ? "Human" : "Protocol Facilitator"}: ${h.content}`).join("\n\n");
     const contents = `${formattedHistory ? formattedHistory + "\n\n" : ""}Human: ${userMessage}\n\nProtocol Facilitator:`;
 
-    const candidateModels = ["gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+    const candidateModels = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
     let response: any = null;
 
     for (const model of candidateModels) {
