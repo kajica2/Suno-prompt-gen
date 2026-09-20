@@ -14,6 +14,8 @@ export function generateProceduralPrompt(config: PromptConfig, reason?: string):
     vocalType = "Warm Vocal Lead",
     instruments = "acoustic guitar, piano",
     structure = "Standard",
+    enableRoomTone = false,
+    roomTone = "natural room ambience",
   } = config;
 
   const isInstrumental =
@@ -77,6 +79,12 @@ export function generateProceduralPrompt(config: PromptConfig, reason?: string):
     const mPart = mood.toLowerCase().split(",")[0].trim();
     const vPart = vocalType.toLowerCase().includes("female") ? "warm female vocal" : vocalType.toLowerCase().includes("male") ? "intimate male vocal" : "expressive vocal";
     tagElements = [gPart, mPart, vPart, "reverb tails", "peaceful"];
+  }
+
+  // If Room Tone is enabled, prioritize appending environmental keyword
+  if (enableRoomTone && roomTone) {
+    const cleanRoom = roomTone.split(",")[0].trim().toLowerCase();
+    tagElements.unshift(cleanRoom);
   }
 
   // Format into comma-separated tags strictly <= 115 chars

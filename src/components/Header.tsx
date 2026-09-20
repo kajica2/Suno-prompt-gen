@@ -1,8 +1,8 @@
-import { Sparkles, Music, BookOpen, Sliders, Feather, Flame, Disc } from "lucide-react";
+import { Sparkles, Music, BookOpen, Sliders, Feather, Flame, Disc, Layers, Radio } from "lucide-react";
 
 interface HeaderProps {
-  currentView?: "studio" | "harmonic" | "debussy" | "raga" | "trumpet";
-  onSelectView?: (view: "studio" | "harmonic" | "debussy" | "raga" | "trumpet") => void;
+  currentView?: "protocols" | "studio" | "busking" | "trumpet" | "debussy" | "raga" | "harmonic";
+  onSelectView?: (view: "protocols" | "studio" | "busking" | "trumpet" | "debussy" | "raga" | "harmonic") => void;
 }
 
 export default function Header({ currentView = "studio", onSelectView }: HeaderProps) {
@@ -19,14 +19,30 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
             <div className="w-4 h-4 bg-amber-500 -rotate-45" />
           </div>
           <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-white/40 font-mono">AI Music Studio</div>
-            <span className="tracking-[0.2em] font-semibold text-sm uppercase text-white">Suno Aura</span>
+            <div className="text-xs uppercase tracking-[0.3em] text-white/40 font-mono">Alchemical & Harmonic Studio</div>
+            <span className="tracking-[0.2em] font-semibold text-sm uppercase text-white">Shine in Peace</span>
           </div>
         </div>
 
         {/* View Switcher Pill */}
         {onSelectView && (
           <div className="flex items-center p-1 rounded-xl bg-stone-950 border border-white/10 shadow-inner overflow-x-auto max-w-full">
+            <button
+              onClick={() => onSelectView("protocols")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "protocols"
+                  ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
+                  : "text-amber-300/80 hover:text-amber-200"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 text-amber-400" />
+              <span>DDSP ASMR</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "protocols" ? "bg-stone-900 text-amber-300 font-bold" : "bg-amber-500/20 text-amber-300"
+              }`}>
+                8
+              </span>
+            </button>
             <button
               onClick={() => onSelectView("studio")}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
@@ -37,6 +53,22 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
             >
               <Sliders className="w-3.5 h-3.5" />
               <span>Prompt Studio</span>
+            </button>
+            <button
+              onClick={() => onSelectView("busking")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "busking"
+                  ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              <Radio className="w-3.5 h-3.5 text-amber-400" />
+              <span>Busking Tracks</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "busking" ? "bg-stone-900 text-amber-300 font-bold" : "bg-amber-500/20 text-amber-300"
+              }`}>
+                10
+              </span>
             </button>
             <button
               onClick={() => onSelectView("trumpet")}

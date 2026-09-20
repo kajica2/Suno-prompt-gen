@@ -8,11 +8,13 @@ import HarmonicStudyEngine from "./components/HarmonicStudyEngine";
 import DebussySuite from "./components/DebussySuite";
 import RagaSuite from "./components/RagaSuite";
 import TrumpetSuite from "./components/TrumpetSuite";
-import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame, Disc } from "lucide-react";
+import ProtocolsSuite from "./components/ProtocolsSuite";
+import BuskingSuite from "./components/BuskingSuite";
+import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame, Disc, Layers, Radio } from "lucide-react";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<"studio" | "harmonic" | "debussy" | "raga" | "trumpet">("studio");
-  const [presetCategory, setPresetCategory] = useState<"all" | "trumpet" | "raga" | "debussy" | "harmonic" | "other">("all");
+  const [currentView, setCurrentView] = useState<"protocols" | "studio" | "busking" | "harmonic" | "debussy" | "raga" | "trumpet">("protocols");
+  const [presetCategory, setPresetCategory] = useState<"all" | "busking" | "trumpet" | "raga" | "debussy" | "harmonic" | "other">("all");
   const [config, setConfig] = useState<PromptConfig>(PRESETS[0].config);
   const [result, setResult] = useState<PromptResult | null>(PRESETS[0].sampleResult);
   const [isLoading, setIsLoading] = useState(false);
@@ -157,7 +159,18 @@ export default function App() {
         {/* Global Navigation Header */}
         <Header currentView={currentView} onSelectView={setCurrentView} />
 
-        {currentView === "harmonic" ? (
+        {currentView === "protocols" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 md:px-10 relative z-10">
+            <ProtocolsSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
+        ) : currentView === "harmonic" ? (
           <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
             <HarmonicStudyEngine
               onApplyConfig={(newConfig, newResult) => {
@@ -202,10 +215,82 @@ export default function App() {
               onSwitchToStudio={() => setCurrentView("studio")}
             />
           </main>
+        ) : currentView === "busking" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <BuskingSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
         ) : (
           <>
             {/* Featured Unplugged & Fusion Suites Ribbons */}
-            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {/* Busking Backing Track Suite Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-stone-900/90 to-stone-950 border border-amber-500/40 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300 shrink-0">
+                    <Radio className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Busking Tracks
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
+                        10 Pocket Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      105 BPM jazz fusion, 81% Audio Influence, no sax/guitar/vox for trumpet soloing.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("busking")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* DDSP ASMR Protocols Suite Banner */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/15 via-amber-500/10 to-stone-950 border border-purple-500/40 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-300 shrink-0">
+                    <Layers className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        DDSP ASMR Trumpet
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
+                        8 Acoustic Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Acoustic trumpet, flugelhorn & real organic instruments across all 7 Living Protocols + ℰ-Console Master.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("protocols")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
               {/* Trumpet Fusion Suite Ribbon */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-stone-900/90 to-stone-950 border border-amber-500/40 flex items-center justify-between gap-3 shadow-xl">
                 <div className="flex items-center gap-3">
@@ -346,6 +431,10 @@ export default function App() {
                 <li className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
                   <span><strong>Push Human Imperfections:</strong> Use keywords like <code className="text-amber-200 font-mono">pedal noise, chair creak, page turn, audible breath, micro timing fluctuation, unquantized, no click track</code> for uncanny acoustic realism.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                  <span><strong>Audio Influence 81% & Room Tone:</strong> When uploading busking backing tracks or loops into Suno, set Audio Influence to <strong className="text-amber-300">81%</strong> and enable <strong className="text-emerald-300">Room Tone</strong> to append environmental cues (e.g. <em>intimate jazz club noise, captured in an wooden concert hall</em>) for pure non-AI acoustic physics.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
@@ -725,6 +814,16 @@ export default function App() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setPresetCategory("busking")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "busking" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Radio className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Busking (10)</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setPresetCategory("trumpet")}
                   className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     presetCategory === "trumpet" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
@@ -767,6 +866,7 @@ export default function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               {PRESETS.filter((preset) => {
+                if (presetCategory === "busking") return preset.id.startsWith("busking");
                 if (presetCategory === "trumpet") return preset.id.startsWith("trumpet");
                 if (presetCategory === "raga") return preset.id.startsWith("raga");
                 if (presetCategory === "debussy") return preset.id.startsWith("debussy");

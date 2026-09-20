@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PromptConfig } from "../types";
-import { Sliders, Sparkles, RefreshCw, HelpCircle, BookOpen } from "lucide-react";
+import { Sliders, Sparkles, RefreshCw, HelpCircle, BookOpen, Volume2, ShieldCheck } from "lucide-react";
+import { ROOM_TONE_OPTIONS } from "../data/buskingPrompts";
 
 interface PromptFormProps {
   config: PromptConfig;
@@ -284,6 +285,101 @@ export default function PromptForm({ config, onChange, onSubmit, isLoading, onOp
               <option key={s} value={s} className="bg-stone-950">{s}</option>
             ))}
           </select>
+        </div>
+
+        {/* Room Tone & Organic Ambience Toggle */}
+        <div className="pt-2 pb-1 border-t border-white/5">
+          <div className="p-3.5 rounded-xl bg-stone-900/80 border border-white/10 hover:border-amber-500/30 transition-all">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className={`p-1.5 rounded-lg transition-colors ${
+                  config.enableRoomTone ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : "bg-white/5 text-stone-400"
+                }`}>
+                  <Volume2 className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-white">Room Tone & Organic Ambience</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono font-semibold flex items-center gap-1">
+                      <ShieldCheck className="w-2.5 h-2.5" />
+                      Anti-AI Organic
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-stone-400 font-light mt-0.5">
+                    Appends physical room noise keywords to style tags to prevent sterile AI sound.
+                  </p>
+                </div>
+              </div>
+
+              {/* Toggle Switch */}
+              <button
+                type="button"
+                onClick={() => {
+                  const newState = !config.enableRoomTone;
+                  onChange({
+                    ...config,
+                    enableRoomTone: newState,
+                    roomTone: config.roomTone || "natural room ambience"
+                  });
+                }}
+                className={`w-11 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-200 ease-in-out shrink-0 ${
+                  config.enableRoomTone ? "bg-amber-500" : "bg-stone-800 border border-stone-700"
+                }`}
+                role="switch"
+                aria-checked={config.enableRoomTone}
+              >
+                <div
+                  className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ease-in-out ${
+                    config.enableRoomTone ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Room Tone Selector Dropdown / Chips when active */}
+            {config.enableRoomTone && (
+              <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                <label className="block text-[10px] uppercase tracking-widest text-amber-300/80 font-mono font-bold">
+                  Acoustic Environment Keyword
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  {[
+                    { id: "concert", label: "Wooden Concert Hall", val: "captured in an wooden concert hall" },
+                    { id: "ambience", label: "Natural Room Ambience", val: "natural room ambience" },
+                    { id: "club", label: "Intimate Jazz Club Noise", val: "intimate jazz club noise" },
+                    { id: "studio", label: "Live Studio Bleed", val: "live studio bleed and acoustic room reflections" }
+                  ].map((env) => {
+                    const isSelected = (config.roomTone || "natural room ambience").includes(env.val);
+                    return (
+                      <button
+                        key={env.id}
+                        type="button"
+                        onClick={() => {
+                          onChange({
+                            ...config,
+                            enableRoomTone: true,
+                            roomTone: env.val
+                          });
+                        }}
+                        className={`text-left px-2.5 py-1.5 rounded-lg text-xs font-mono transition-all border flex items-center justify-between cursor-pointer ${
+                          isSelected
+                            ? "bg-amber-500/20 border-amber-500/50 text-amber-200 font-medium"
+                            : "bg-black/30 border-white/5 text-stone-400 hover:text-stone-200 hover:border-white/15"
+                        }`}
+                      >
+                        <span className="truncate">{env.label}</span>
+                        {isSelected && <span className="text-[10px] text-amber-400 font-bold ml-1">✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="p-2 rounded-lg bg-black/40 border border-white/5 text-[10px] text-stone-400 font-mono flex items-center justify-between">
+                  <span className="text-stone-500 uppercase tracking-wider">Active Tag:</span>
+                  <span className="text-amber-300 font-semibold">{config.roomTone || "natural room ambience"}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Submit Button */}

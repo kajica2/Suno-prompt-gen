@@ -6,6 +6,8 @@ export interface PromptConfig {
   vocalType: string;
   instruments: string;
   structure: string;
+  enableRoomTone?: boolean;
+  roomTone?: string;
 }
 
 export interface PromptResult {

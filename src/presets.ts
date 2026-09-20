@@ -2,6 +2,35 @@ import { Preset } from "./types";
 import { DEBUSSY_PROMPTS } from "./data/debussyPrompts";
 import { RAGA_PROMPTS } from "./data/ragaPrompts";
 import { TRUMPET_PROMPTS } from "./data/trumpetPrompts";
+import { BUSKING_PROMPTS } from "./data/buskingPrompts";
+
+export const BUSKING_PRESETS: Preset[] = BUSKING_PROMPTS.map((p) => ({
+  id: `busking-${p.id}`,
+  name: `Busking Track #${p.number}: ${p.title}`,
+  description: `${p.focus} • 105 BPM (Audio Influence 81%)`,
+  config: {
+    subtheme: `Jazz Fusion Busking (${p.title})`,
+    genre: "Instrumental Jazz Fusion Backing Track",
+    mood: "Syncopated, Blues-Influenced Pocket (105 BPM)",
+    tempo: "105 BPM, 4/4 Steady Human Pocket",
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: "percussive drums with brushes, deep electric bass, slap accents, hi-hat ghost notes",
+    structure: p.tags.join(" "),
+    enableRoomTone: true,
+    roomTone: "intimate jazz club noise"
+  },
+  sampleResult: {
+    title: `${p.number}. ${p.title} (105 BPM)`,
+    styleTags: p.styleTags,
+    promptDescription: p.promptText,
+    lyrics: p.tags.join(" ") + "\n\n[Instrumental]\n[No saxophone, no vocals, no guitar, no spoken word]\n[Leaves dynamic acoustic space for live trumpet or horn soloing]",
+    tips: [
+      "Audio Influence: Set to 81% in Suno when uploading your reference audio loop.",
+      "Room Tone: Natural ambient room acoustics combat AI artificial sheen.",
+      "Negative prompt: no saxophone, no soprano saxophone, no vocals, no voice, no guitar, no spoken word."
+    ]
+  }
+}));
 
 export const TRUMPET_PRESETS: Preset[] = TRUMPET_PROMPTS.map((p) => ({
   id: p.id,
@@ -1008,6 +1037,6 @@ We are living in a harmonic dream.`,
   }
 ];
 
-export const PRESETS: Preset[] = [...TRUMPET_PRESETS, ...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
+export const PRESETS: Preset[] = [...BUSKING_PRESETS, ...TRUMPET_PRESETS, ...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
 
 

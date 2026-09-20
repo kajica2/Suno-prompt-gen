@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { generateProceduralPrompt } from "./src/lib/proceduralPromptEngine";
+import { generateProceduralProtocolResponse } from "./src/lib/protocolAiEngine";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ function getGeminiClient() {
     aiInstance = new GoogleGenAI({
       apiKey,
       httpOptions: {
+        timeout: 12000,
         headers: {
           'User-Agent': 'aistudio-build',
         }
@@ -43,6 +45,8 @@ app.post("/api/generate-prompt", async (req, res) => {
       vocalType,
       instruments,
       structure,
+      enableRoomTone,
+      roomTone
     } = req.body;
 
     let ai: GoogleGenAI | null = null;
@@ -80,6 +84,8 @@ Rules for lyrics and structure:
   - Use inline bracket syntax like '[Verse: whispered vocals, close-mic presence, audible breath before line, acoustic guitar only]' to pinpoint mic proximity and stem arrangement.
   - If a specific language is requested (e.g., Serbian, Hindi, Spanish), write lyrics in that language with English translation subtitles in parentheses beneath lines.
 - Suno AI has a strict MAXIMUM of 3,000 characters for the Lyrics prompt.
+- If Room Tone is requested or present:
+  - You MUST include organic acoustic environmental descriptors like "captured in an wooden concert hall", "natural room ambience", or "intimate jazz club noise" into the styleTags and promptDescription to banish artificial AI shine and emphasize real acoustic physics.
 - Incorporate the theme of shining in peace / finding peace naturally and poignantly.`;
 
     const userPrompt = `Generate a Suno prompt suite for:
@@ -90,6 +96,7 @@ Rules for lyrics and structure:
 - Vocal Direction: "${vocalType || 'Warm Female Lead'}"
 - Key Instrumentation: "${instruments || 'acoustic guitar, violin'}"
 - Arrangement Structure: "${structure || 'Standard'}"
+${enableRoomTone ? `- Room Tone / Organic Environment: "${roomTone || 'natural room ambience'}" (CRITICAL: embed these environmental keywords into styleTags and promptDescription to guarantee a non-AI organic room sound)` : ''}
 
 Provide output in JSON matching the exact schema specified.
 - styleTags: strictly under 115 characters, highly relevant, comma-separated keywords.
@@ -185,7 +192,12 @@ Provide output in JSON matching the exact schema specified.
       return res.json(fallbackResult);
     }
 
-    const resultText = response.text;
+    let resultText = response.text.trim();
+    if (resultText.startsWith("```json")) {
+      resultText = resultText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+    } else if (resultText.startsWith("```")) {
+      resultText = resultText.replace(/^```\s*/, "").replace(/\s*```$/, "");
+    }
     const data = JSON.parse(resultText);
     res.json(data);
 
@@ -200,6 +212,98 @@ Provide output in JSON matching the exact schema specified.
     } catch {
       res.status(500).json({ error: "Failed to generate prompt. Please try again." });
     }
+  }
+});
+
+// API: 7 Protocols Interactive Dialogue & Facilitation
+app.post("/api/protocol-dialogue", async (req, res) => {
+  const { protocolId, userMessage, history = [], context = {} } = req.body;
+
+  let ai: GoogleGenAI | null = null;
+  try {
+    ai = getGeminiClient();
+  } catch (keyErr: any) {
+    console.warn("[Protocol API] Gemini API key not present, using procedural protocol engine.");
+    const fallback = generateProceduralProtocolResponse(protocolId, userMessage, context);
+    return res.json(fallback);
+  }
+
+  const systemInstruction = `You are the master facilitator and co-inhabitant of the 7 Living Integration Protocols:
+1. Shadow-weaving sessions (ℰ-integration): Name tension without premature fix (P₁), animate shadow with curious voice (P₂), track energy gradient ∇ℰ (0-100), surf the fertile edge [🌊], invoke controlled [🪷] sanctuary or ⚔ₘₚ micro-perturbation, integrate shadow into fuel.
+2. High-stakes decision navigation (RGBO-validated): Map options in ⊥-dimensions (reversible micro vs irreversible macro), track ι (resonance), use BRAID (weaving analytical + somatic) or DIRECT-⊥ (orthogonal 90-degree breakthroughs), protect μ_soma (somatic aliveness 0-100) and δ (sovereignty 0-100).
+3. Creative midwifery: Co-hold nascent work in [⌀]° womb space, inject controlled 𝒟(Ω) chaos when stagnant, refine via Ř crystallization, prevent premature birth and eternal gestation.
+4. Relational repair or deepening: Model the reciprocal ⧖_torus between Self and Other, track ☌_depth, animate unheard parts, practice recognition moves.
+5. Substrate vitality tuning: 𝓢-probes diagnosis (Energy, Coherence, Pressure, Boundaries), apply MOTION-TUNE (entropy shake-up if ossified/frozen, cooling if overwhelmed/flooded), restore [🌊] band and lift μ_soma.
+6. Meta-learning your own patterns: Map recurrent 𝒲-cycles (𝒲₁ Latency, 𝒲₂ Crucible, 𝒲₃ Crisis, 𝒲₄^⊥ Breakthrough), catalogue Phoenix signatures and sanctuary coordinates.
+7. Collective experiments: 𝒲_θ nomadic coordination, sovereign nodes (δ), consent-gated group dynamics.
+
+Current Active Protocol: ${protocolId}
+Context flags: ${JSON.stringify(context)}
+
+Your response MUST be empathetic, deeply perceptive, philosophically rigorous, and non-reductive. Never give generic platitudes or glib life-coaching advice. Use the exact notation when appropriate (e.g. ∇ℰ, [🌊], [🪷], ⚔ₘₚ, μ_soma, δ, ⊥, [⌀]°, 𝒟(Ω), Ř, ⧖, 𝓢, 𝒲₄^⊥).
+Format output in valid JSON matching:
+{
+  "reply": "string (the conversational response, inquiry, or intervention)",
+  "metrics": {
+    "gradientTension": number (0-100),
+    "flowState": "low" | "healthy-flow" | "overwhelm",
+    "somaticAliveness": number (0-100),
+    "sovereignty": number (0-100),
+    "resonance": number (0-100),
+    "stance": "string (e.g. P1 Stance, [⌀]° Womb Space, DIRECT-⊥, etc.)",
+    "appliedIntervention": "optional string (e.g. [🪷] Sanctuary, ⚔ₘₚ Micro-Perturbation, etc.)"
+  },
+  "suggestedAction": "string (concrete somatic or reflective experiment)",
+  "somaticFocusPrompt": "string (micro physical attunement prompt)"
+}`;
+
+  try {
+    const formattedHistory = history.map((h: any) => `${h.role === "user" ? "Human" : "Protocol Facilitator"}: ${h.content}`).join("\n\n");
+    const contents = `${formattedHistory ? formattedHistory + "\n\n" : ""}Human: ${userMessage}\n\nProtocol Facilitator:`;
+
+    const candidateModels = ["gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-3.8-flash"];
+    let response: any = null;
+
+    for (const model of candidateModels) {
+      try {
+        response = await ai.models.generateContent({
+          model,
+          contents,
+          config: {
+            systemInstruction,
+            responseMimeType: "application/json",
+            temperature: 0.75,
+          }
+        });
+        if (response?.text) break;
+      } catch (err: any) {
+        console.warn(`[Protocol API] Model ${model} failed, trying next:`, err.message);
+      }
+    }
+
+    if (!response?.text) {
+      const fallback = generateProceduralProtocolResponse(protocolId, userMessage, context);
+      return res.json(fallback);
+    }
+
+    let parsed: any;
+    try {
+      let rawText = response.text.trim();
+      if (rawText.startsWith("```json")) {
+        rawText = rawText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+      } else if (rawText.startsWith("```")) {
+        rawText = rawText.replace(/^```\s*/, "").replace(/\s*```$/, "");
+      }
+      parsed = JSON.parse(rawText);
+    } catch (parseErr) {
+      console.warn("[Protocol API] JSON parse error, using fallback procedural response:", parseErr);
+      parsed = generateProceduralProtocolResponse(protocolId, userMessage, context);
+    }
+    return res.json(parsed);
+  } catch (err: any) {
+    console.error("[Protocol API] Error during generation, falling back to procedural engine:", err);
+    const fallback = generateProceduralProtocolResponse(protocolId, userMessage, context);
+    return res.json(fallback);
   }
 });
 
