@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PromptConfig } from "../types";
-import { Sliders, Sparkles, RefreshCw, HelpCircle, BookOpen, Volume2, ShieldCheck, Gauge, Ban, Check, Copy, RotateCcw } from "lucide-react";
+import { Sliders, Sparkles, RefreshCw, HelpCircle, BookOpen, Volume2, ShieldCheck, Gauge, Ban, Check, Copy, RotateCcw, Dna, Waves } from "lucide-react";
 import { ROOM_TONE_OPTIONS } from "../data/buskingPrompts";
 
 interface PromptFormProps {
@@ -9,22 +9,72 @@ interface PromptFormProps {
   onSubmit: () => void;
   isLoading: boolean;
   onOpenHarmonicEngine?: () => void;
+  onOpenStyleBreeder?: () => void;
+  onOpenAmbiences?: () => void;
 }
 
 export const NEGATIVE_EXCLUSION_CHIPS = [
-  { id: "no-sax", tag: "no saxophone", label: "no saxophone", desc: "Prevents sax from stealing acoustic trumpet leads" },
+  { id: "no-reverb", tag: "no reverb", label: "no reverb", desc: "Forces acoustic room reality: the physical space IS the reverb" },
+  { id: "no-digital-polish", tag: "no digital polish", label: "no digital polish", desc: "Eliminates modern glossy plugins, gating, and digital mastering" },
+  { id: "no-horns", tag: "no horns", label: "no horns", desc: "Suppresses all horn instruments (vital for rhythm section dominance)" },
+  { id: "no-lead-melody", tag: "no lead melody", label: "no lead melody", desc: "Strictly forces backing rhythm section only without melodic solos" },
+  { id: "no-4-4", tag: "no 4/4 straight beat", label: "no 4/4 straight beat", desc: "Crucial for odd meters: prevents Suno from collapsing 7/8, 9/8, 11/8 into 4/4" },
+  { id: "no-brass", tag: "no brass", label: "no brass", desc: "Prevents brass section and horn stabs" },
+  { id: "no-flute", tag: "no flute", label: "no flute", desc: "Prevents high woodwind intrusions" },
+  { id: "no-trumpet", tag: "no trumpet", label: "no trumpet", desc: "Excludes trumpet for rhythm section or keys dominance" },
+  { id: "no-sax", tag: "no sax", label: "no sax", desc: "Prevents saxophone from stealing lead space" },
   { id: "no-vocals", tag: "no vocals", label: "no vocals", desc: "Forces pure instrumental arrangement" },
-  { id: "no-guitar", tag: "no guitar", label: "no guitar", desc: "Leaves acoustic headroom for trumpet & bass" },
+  { id: "no-guitar", tag: "no guitar", label: "no guitar", desc: "Leaves acoustic headroom for lead instrument & bass" },
   { id: "no-synths", tag: "no synthesizer", label: "no synthesizer", desc: "Eliminates synthetic artificial pads" },
   { id: "no-edm", tag: "no EDM drop", label: "no EDM drop", desc: "Avoids loud artificial beat drops" },
   { id: "no-quantized", tag: "no quantized drums", label: "no quantized drums", desc: "Preserves natural human pocket timing" },
   { id: "no-autotune", tag: "no autotune", label: "no autotune", desc: "Suppresses vocal processing artifacts" },
-  { id: "no-brass-sec", tag: "no brass section", label: "no brass section", desc: "Isolates solo acoustic trumpet instead of big band" },
-  { id: "no-piano", tag: "no piano", label: "no piano", desc: "Focuses strictly on horn and rhythm section" },
   { id: "no-spoken", tag: "no spoken word", label: "no spoken word", desc: "Prevents AI verbal chatter over breaks" },
 ];
 
 export const NEGATIVE_FOCUS_PRESETS = [
+  {
+    id: "fidelity-universal-negatives",
+    title: "Audio Upload Reference Lock (Universal Negatives)",
+    tags: "no new instruments, no new melodies, no stylistic changes, no genre shifts, no remix, no new harmonies, no added sections, no removed sections, no tempo change, no key change, no auto-tune, no digital polish, no reverb plugins, no EDM, no trap",
+    description: "Universal negative exclusions for uploaded audio clips: strictly prevents Suno from adding unwanted instruments, harmonies, remixing, or altering key and tempo."
+  },
+  {
+    id: "impossible-hybrid-studios",
+    title: "Impossible Hybrids (Universal Negatives + No Horns)",
+    tags: "no reverb plugins, no digital polish, no noise reduction, no gating, no stereo widening, no auto-tune, no EDM, no trap, no horns, no trumpet, no sax, no brass",
+    description: "Universal negatives for the 7 Impossible Hybrid Studios: forces contradictory room synthesis and suppresses modern reverb plugins and horn intrusions."
+  },
+  {
+    id: "legendary-studios-7",
+    title: "7 Legendary Studios (No Reverb Plugins / No Polish)",
+    tags: "no reverb plugins, no digital polish, no noise reduction, no gating, no stereo widening, no auto-tune, no EDM, no trap",
+    description: "Universal negatives for Abbey Road, Columbia 30th St, Stax, Van Gelder, Black Ark, Muscle Shoals & Hansa Studios."
+  },
+  {
+    id: "ambience-physical-spaces",
+    title: "Physical Ambience (No Reverb / Digital Polish)",
+    tags: "no reverb, no digital polish, no noise reduction, no gating, no compression, no EQ, no stereo widening, no delay, no chorus",
+    description: "Universal negatives for physical recording spaces: the room IS the reverb. Strictly prevents digital polish and fake plugins."
+  },
+  {
+    id: "odd-meter-stack",
+    title: "Odd Meter Tri-Stack Exclusions",
+    tags: "no horns, no trumpet, no saxophone, no brass, no flute, no vocals, no 4/4 straight beat, no quantized grid, no EDM, no trap",
+    description: "Essential for 7/8, 3/4, 9/8, 11/8, 10/8, 5/4, 13/8: strictly suppresses horns, vocals, and standard 4/4 pop grids."
+  },
+  {
+    id: "afro-1965-rhythm",
+    title: "1965 Afro Rhythm Section Only",
+    tags: "no horns, no trumpet, no sax, no lead melody, no vocals",
+    description: "1965 Afrobeat / Ethio-jazz / Highlife / Descarga: pure rhythm section only, no horns, no trumpet, no sax, no lead melody."
+  },
+  {
+    id: "ethio-no-horns",
+    title: "Ethio-Jazz No-Horns Pocket",
+    tags: "no horns, no trumpet, no saxophone, no brass, no flute, no vocals",
+    description: "Mulatu Astatke modal pocket: strictly suppresses all horns & vocals to let vibraphone, keys & drums lead."
+  },
   {
     id: "trumpet-drum",
     title: "Trumpet & Drum Focus",
@@ -46,6 +96,8 @@ export const NEGATIVE_FOCUS_PRESETS = [
 ];
 
 const GENRE_SUGGESTIONS = [
+  "Mulatu Astatke-Inspired Ethio-Jazz, 1960s/70s Ethiopian Jazz",
+  "Modal Minor Pentatonic Groove with Vibraphone Lead",
   "Bartókian Modern Classical & Symmetrical Axes",
   "Late Romantic Cinematic & Neo-Riemannian Film Score",
   "Modal Jazz & Warm Soul Harmony",
@@ -123,7 +175,7 @@ const STRUCTURE_SUGGESTIONS = [
   "Atmospheric (Long instrumental intro, short meditative refrain)"
 ];
 
-export default function PromptForm({ config, onChange, onSubmit, isLoading, onOpenHarmonicEngine }: PromptFormProps) {
+export default function PromptForm({ config, onChange, onSubmit, isLoading, onOpenHarmonicEngine, onOpenStyleBreeder, onOpenAmbiences }: PromptFormProps) {
   const [showInstrumentsTip, setShowInstrumentsTip] = useState(false);
   const [copiedNegative, setCopiedNegative] = useState(false);
 
@@ -205,7 +257,7 @@ export default function PromptForm({ config, onChange, onSubmit, isLoading, onOp
       </div>
 
       {onOpenHarmonicEngine && (
-        <div className="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-between gap-2">
+        <div className="mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-xs text-amber-200">
             <BookOpen className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span className="font-sans font-light">Study <strong>Bartók axes, II-V-I & Neo-Riemannian</strong> harmony</span>
@@ -216,6 +268,38 @@ export default function PromptForm({ config, onChange, onSubmit, isLoading, onOp
             className="text-[11px] font-mono text-amber-300 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 px-2.5 py-1 rounded-lg transition-colors shrink-0 cursor-pointer font-medium"
           >
             Open Engine →
+          </button>
+        </div>
+      )}
+
+      {onOpenAmbiences && (
+        <div className="mb-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs text-emerald-200">
+            <Waves className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <span className="font-sans font-light">Explore <strong>7 Physical Recording Ambiences</strong> (no reverb/digital polish)</span>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenAmbiences}
+            className="text-[11px] font-mono text-emerald-300 hover:text-white bg-emerald-500/20 hover:bg-emerald-500/30 px-2.5 py-1 rounded-lg transition-colors shrink-0 cursor-pointer font-medium"
+          >
+            Open Ambiences →
+          </button>
+        </div>
+      )}
+
+      {onOpenStyleBreeder && (
+        <div className="mb-5 p-3 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs text-purple-200">
+            <Dna className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+            <span className="font-sans font-light">Cross-pollinate & <strong>breed new styles</strong> from 2 traditions</span>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenStyleBreeder}
+            className="text-[11px] font-mono text-purple-300 hover:text-white bg-purple-500/20 hover:bg-purple-500/30 px-2.5 py-1 rounded-lg transition-colors shrink-0 cursor-pointer font-medium"
+          >
+            Open Breeder →
           </button>
         </div>
       )}

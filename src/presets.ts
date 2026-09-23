@@ -4,6 +4,238 @@ import { RAGA_PROMPTS } from "./data/ragaPrompts";
 import { TRUMPET_PROMPTS } from "./data/trumpetPrompts";
 import { BUSKING_PROMPTS } from "./data/buskingPrompts";
 import { BAMBAM_PROMPTS } from "./data/bambamPrompts";
+import { ETHIO_JAZZ_PROMPTS } from "./data/ethioJazzPrompts";
+import { AFRO_1965_PROMPTS, AFRO_1965_HARD_PREFIX } from "./data/afro1965Prompts";
+import { ODD_METER_PROMPTS } from "./data/oddMeterPrompts";
+import {
+  RECORDING_AMBIENCES,
+  LEGENDARY_STUDIOS,
+  IMPOSSIBLE_HYBRID_STUDIOS
+} from "./data/recordingAmbiences";
+import { FIDELITY_LOCK_PROTOCOLS } from "./data/fidelityLockPrompts";
+
+export const FIDELITY_LOCK_PRESETS: Preset[] = FIDELITY_LOCK_PROTOCOLS.map((p) => ({
+  id: `fidelity-${p.id}`,
+  name: `Fidelity Lock #${p.number}: ${p.title}`,
+  description: `${p.tagline} [${p.recommendedSunoFeature} | AI: ${p.suggestedAudioInfluence}]`,
+  config: {
+    subtheme: `Fidelity Lock #${p.number}: ${p.title} (${p.category})`,
+    genre: p.title,
+    mood: "Unaltered Master Blueprint, Zero Hallucinations, Exact Acoustic Match",
+    tempo: "Preserve Exact Original Tempo, Groove & Human Timing",
+    vocalType: "Preserve Exact Source Vocals, Accents & Phrasing",
+    instruments: "Preserve Exact Source Instrumentation & Mix Balance",
+    structure: "Preserve Exact Song Structure & Section Durations"
+  },
+  sampleResult: {
+    title: p.title,
+    styleTags: "audio upload fidelity lock, master reference blueprint, exact replica, no creative liberties, unaltered source",
+    promptDescription: p.promptText,
+    lyrics: `[Master Audio Reference Lock Directive]
+[Target Feature: ${p.recommendedSunoFeature}]
+[Recommended Audio Influence: ${p.suggestedAudioInfluence}]
+
+[Directives & Negative Guardrails]
+${p.keyExclusions}
+
+[Upload Conditioning Prompt]
+${p.promptText}`,
+    tips: p.proTips
+  }
+}));
+
+export const LEGENDARY_STUDIOS_PRESETS: Preset[] = LEGENDARY_STUDIOS.map((s) => ({
+  id: `legendary-${s.id}`,
+  name: `Studio #${s.number}: ${s.name} (${s.subtitle})`,
+  description: `${s.era} ${s.spaceType} · ${s.signature}`,
+  config: {
+    subtheme: `Legendary Studio #${s.number}: ${s.name} (${s.subtitle})`,
+    genre: s.stylePrompt,
+    mood: `${s.character}, Analog Tape, Valve Compression`,
+    tempo: "Organic Live Feel",
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: "Acoustic rhythm section, vintage studio console, plate/tape warmth",
+    structure: s.arrangementPrompt,
+    enableRoomTone: true,
+    roomTone: `${s.name.toLowerCase()} room tone, ${s.signature}`,
+    negativePrompt: s.negativePrompt,
+    appendExclusionsToStyle: true
+  },
+  sampleResult: {
+    title: `${s.name} — "${s.subtitle}"`,
+    styleTags: s.stylePrompt.length <= 120 ? s.stylePrompt : s.stylePrompt.slice(0, 115) + "...",
+    promptDescription: `${s.character} Notable artists: ${s.notableArtists}.`,
+    lyrics: s.arrangementPrompt,
+    negativePrompt: s.negativePrompt,
+    tips: [
+      `Physical Space: ${s.spaceType} (${s.era})`,
+      `Signature Acoustic Anchor: ${s.signature}`,
+      `Intro Tone Anchor: ${s.introSeconds} seconds before instruments enter tells Suno "this is a real room".`,
+      `Outro Payoff: ${s.outroSeconds} seconds of decaying room ambience.`
+    ]
+  }
+}));
+
+export const IMPOSSIBLE_HYBRID_STUDIOS_PRESETS: Preset[] = IMPOSSIBLE_HYBRID_STUDIOS.map((h) => ({
+  id: `hybridstudio-${h.id}`,
+  name: `Impossible Hybrid #${h.number}: ${h.name}`,
+  description: `${h.subtitle} · ${h.spaceA} + ${h.spaceB}`,
+  config: {
+    subtheme: `Impossible Hybrid Studio #${h.number}: ${h.name} (${h.subtitle})`,
+    genre: h.stylePrompt,
+    mood: `${h.character}, ${h.contradiction}`,
+    tempo: "Unquantized Human Timing",
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: "Impossible acoustic hybrid setup, dual physical tracking spaces",
+    structure: h.arrangementPrompt,
+    enableRoomTone: true,
+    roomTone: `${h.name.toLowerCase()} impossible room tone, ${h.contradiction}`,
+    negativePrompt: h.negativePrompt,
+    appendExclusionsToStyle: true
+  },
+  sampleResult: {
+    title: `${h.name} — "${h.subtitle}"`,
+    styleTags: h.stylePrompt.length <= 120 ? h.stylePrompt : h.stylePrompt.slice(0, 115) + "...",
+    promptDescription: `${h.character} Impossible Physics: ${h.contradiction}`,
+    lyrics: h.arrangementPrompt,
+    negativePrompt: h.negativePrompt,
+    tips: [
+      `Fusing Two Legendary Rooms: ${h.spaceA} × ${h.spaceB}`,
+      `Contradiction: ${h.contradiction}`,
+      `Intro Room Tone Anchor: ${h.introSeconds} seconds`,
+      `Outro Payoff: ${h.outroSeconds} seconds`,
+      h.oddMeterVariant ? `Odd Meter Variant: ${h.oddMeterVariant}` : ""
+    ].filter(Boolean)
+  }
+}));
+
+export const RECORDING_AMBIENCES_PRESETS: Preset[] = RECORDING_AMBIENCES.map((a) => ({
+  id: `ambience-${a.id}`,
+  name: `Ambience #${a.number}: ${a.title} (${a.spaceName})`,
+  description: `${a.decay} decay · ${a.air} air · Physical room`,
+  config: {
+    subtheme: `Recording Ambience #${a.number}: ${a.title} (${a.spaceName})`,
+    genre: a.stylePrompt,
+    mood: `${a.acousticSignature}, Unquantized, Valve Compression`,
+    tempo: "Natural Organic Timing",
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: "Live acoustic instruments, tape machine, room microphones",
+    structure: a.arrangementPrompt,
+    enableRoomTone: true,
+    roomTone: `${a.title.toLowerCase()} room tone, ${a.acousticSignature}`,
+    negativePrompt: a.negativePrompt,
+    appendExclusionsToStyle: true
+  },
+  sampleResult: {
+    title: `${a.number}. ${a.title} — "${a.spaceName}"`,
+    styleTags: a.stylePrompt.length <= 120 ? a.stylePrompt : a.compactStyleTags,
+    promptDescription: a.character,
+    lyrics: a.arrangementPrompt,
+    negativePrompt: a.negativePrompt,
+    tips: [
+      `Intro Room Tone Anchor: ${a.introAnchorSeconds} seconds before notes tells Suno "this is a real room".`,
+      `Outro Payoff: Room tone lingers for ${a.outroTailSeconds} seconds into silence.`,
+      "Never add reverb in the prompt — the room IS the reverb.",
+      ...a.proTips
+    ]
+  }
+}));
+
+export const ODD_METER_PRESETS: Preset[] = ODD_METER_PROMPTS.map((p) => ({
+  id: `oddmeter-${p.id}`,
+  name: `Odd Meter #${p.number}: ${p.title} (${p.meter})`,
+  description: `${p.meter} Ethio-Jazz (${p.tempoDesc})`,
+  config: {
+    subtheme: `Odd Meter Ethio-Jazz (#${p.number} ${p.title} - ${p.meter})`,
+    genre: `Ethio-Jazz in ${p.meter}, odd time signature, Mulatu Astatke-inspired`,
+    mood: "Modal Minor Pentatonic, Syncopated Odd-Meter Pocket, Analog Tape",
+    tempo: p.tempoDesc,
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: p.instrumentation.join(", "),
+    structure: p.arrangementLyricsPrompt,
+    enableRoomTone: true,
+    roomTone: "analog tape hiss, close-mic room tone, warm valve compression",
+    negativePrompt: p.negativePrompt,
+    appendExclusionsToStyle: true
+  },
+  sampleResult: {
+    title: `${p.number}. ${p.title} (${p.meter} · ${p.bpm} BPM)`,
+    styleTags: p.stylePrompt.length <= 120 ? p.stylePrompt : p.compactStyleTags,
+    promptDescription: p.stylePrompt,
+    lyrics: p.arrangementLyricsPrompt,
+    negativePrompt: p.negativePrompt,
+    tips: [
+      `Pro Tip for Suno: Meter in 3 places — Style, Arrangement first line, and Intro count-in (${p.countInTag}).`,
+      `Subdivision: ${p.meterBreakdown}`,
+      p.triStackingTip,
+      `Stackable Exclusions: ${p.negativePrompt}`
+    ]
+  }
+}));
+
+export const AFRO_1965_PRESETS: Preset[] = AFRO_1965_PROMPTS.map((p) => ({
+  id: `afro1965-${p.id}`,
+  name: `1965 Afro #${p.number}: ${p.title}`,
+  description: `${p.genre} (${p.tempo} · Rhythm Section Only)`,
+  config: {
+    subtheme: `1965 Afro Rhythm Section (#${p.number} ${p.title})`,
+    genre: `${p.genre}, Vintage Mono, Live One-Take`,
+    mood: "Unquantized Human Timing, Valve Compression, Room Tone",
+    tempo: p.tempo,
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: p.instrumentation.join(", "),
+    structure: p.arrangementLyricsPrompt,
+    enableRoomTone: true,
+    roomTone: "vintage mono analog tape hiss, room tone, valve compression",
+    negativePrompt: p.negativePrompt,
+    appendExclusionsToStyle: true
+  },
+  sampleResult: {
+    title: `${p.number}. ${p.title} (1965 Rhythm Section Only)`,
+    styleTags: p.stylePrompt.length <= 120 ? p.stylePrompt : p.compactStyleTags,
+    promptDescription: p.stylePrompt,
+    lyrics: p.arrangementLyricsPrompt,
+    negativePrompt: p.negativePrompt,
+    tips: [
+      ...p.tips,
+      `Anti-Horn Rule: "${AFRO_1965_HARD_PREFIX}"`,
+      `Region: ${p.region}`,
+      `Negative exclusions: ${p.negativePrompt}`
+    ]
+  }
+}));
+
+export const ETHIO_JAZZ_PRESETS: Preset[] = ETHIO_JAZZ_PROMPTS.map((p) => ({
+  id: `ethiojazz-${p.id}`,
+  name: `Ethio-Jazz #${p.number}: ${p.title}`,
+  description: `${p.focus} (${p.tempo} BPM · Mulatu Astatke)`,
+  config: {
+    subtheme: `Mulatu Astatke Ethio-Jazz (#${p.number} ${p.title})`,
+    genre: "1960s/70s Ethiopian Jazz, Mulatu Astatke-Inspired",
+    mood: `${p.modalScale}, Syncopated Pocket, Analog Tape`,
+    tempo: `${p.tempo} BPM, ${p.meter}`,
+    vocalType: "Instrumental (No Vocals, [Instrumental])",
+    instruments: p.instrumentation.join(", "),
+    structure: p.arrangementLyricsPrompt,
+    enableRoomTone: true,
+    roomTone: "close-mic room tone with tape hiss",
+    negativePrompt: p.negativePrompt,
+    appendExclusionsToStyle: true
+  },
+  sampleResult: {
+    title: `${p.number}. ${p.title} (${p.tempo} BPM)`,
+    styleTags: p.stylePrompt.length <= 120 ? p.stylePrompt : p.compactStyleTags,
+    promptDescription: p.stylePrompt,
+    lyrics: p.arrangementLyricsPrompt,
+    negativePrompt: p.negativePrompt,
+    tips: [
+      ...p.tips,
+      `Modal Scale: ${p.modalScale}`,
+      `Lead: ${p.leadInstrument}`,
+      `Negative Exclusions: ${p.negativePrompt}`
+    ]
+  }
+}));
 
 export const BAMBAM_PRESETS: Preset[] = BAMBAM_PROMPTS.map((p) => ({
   id: `bambam-${p.id}`,
@@ -1077,6 +1309,20 @@ We are living in a harmonic dream.`,
   }
 ];
 
-export const PRESETS: Preset[] = [...BAMBAM_PRESETS, ...BUSKING_PRESETS, ...TRUMPET_PRESETS, ...RAGA_PRESETS, ...DEBUSSY_PRESETS, ...BASE_PRESETS];
+export const PRESETS: Preset[] = [
+  ...FIDELITY_LOCK_PRESETS,
+  ...LEGENDARY_STUDIOS_PRESETS,
+  ...IMPOSSIBLE_HYBRID_STUDIOS_PRESETS,
+  ...RECORDING_AMBIENCES_PRESETS,
+  ...ODD_METER_PRESETS,
+  ...AFRO_1965_PRESETS,
+  ...ETHIO_JAZZ_PRESETS,
+  ...BAMBAM_PRESETS,
+  ...BUSKING_PRESETS,
+  ...TRUMPET_PRESETS,
+  ...RAGA_PRESETS,
+  ...DEBUSSY_PRESETS,
+  ...BASE_PRESETS
+];
 
 

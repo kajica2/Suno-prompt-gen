@@ -1,8 +1,8 @@
-import { Sparkles, Music, BookOpen, Sliders, Feather, Flame, Disc, Layers, Radio } from "lucide-react";
+import { Sparkles, Music, BookOpen, Sliders, Feather, Flame, Disc, Layers, Radio, Clock, Dna, Waves, ShieldCheck } from "lucide-react";
 
 interface HeaderProps {
-  currentView?: "protocols" | "studio" | "busking" | "bambam" | "trumpet" | "debussy" | "raga" | "harmonic";
-  onSelectView?: (view: "protocols" | "studio" | "busking" | "bambam" | "trumpet" | "debussy" | "raga" | "harmonic") => void;
+  currentView?: "protocols" | "fidelity" | "studio" | "busking" | "bambam" | "ethiojazz" | "afro1965" | "oddmeter" | "ambiences" | "breed" | "trumpet" | "debussy" | "raga" | "harmonic";
+  onSelectView?: (view: "protocols" | "fidelity" | "studio" | "busking" | "bambam" | "ethiojazz" | "afro1965" | "oddmeter" | "ambiences" | "breed" | "trumpet" | "debussy" | "raga" | "harmonic") => void;
 }
 
 export default function Header({ currentView = "studio", onSelectView }: HeaderProps) {
@@ -41,6 +41,22 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
                 currentView === "protocols" ? "bg-stone-900 text-amber-300 font-bold" : "bg-amber-500/20 text-amber-300"
               }`}>
                 8
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("fidelity")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "fidelity"
+                  ? "bg-indigo-600 text-white font-bold shadow-sm"
+                  : "text-indigo-300/80 hover:text-indigo-200"
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Reference Locks</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "fidelity" ? "bg-stone-900 text-indigo-300 font-bold" : "bg-indigo-500/20 text-indigo-300"
+              }`}>
+                10
               </span>
             </button>
             <button
@@ -84,6 +100,86 @@ export default function Header({ currentView = "studio", onSelectView }: HeaderP
                 currentView === "bambam" ? "bg-stone-900 text-orange-300 font-bold" : "bg-orange-500/20 text-orange-300"
               }`}>
                 10
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("ethiojazz")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "ethiojazz"
+                  ? "bg-amber-500 text-stone-950 font-bold shadow-sm"
+                  : "text-amber-300/80 hover:text-amber-200"
+              }`}
+            >
+              <Disc className="w-3.5 h-3.5 text-amber-400" />
+              <span>Ethio-Jazz</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "ethiojazz" ? "bg-stone-900 text-amber-300 font-bold" : "bg-amber-500/20 text-amber-300"
+              }`}>
+                5
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("afro1965")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "afro1965"
+                  ? "bg-yellow-500 text-stone-950 font-bold shadow-sm"
+                  : "text-yellow-300/80 hover:text-yellow-200"
+              }`}
+            >
+              <Radio className="w-3.5 h-3.5 text-yellow-400" />
+              <span>1965 Afro</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "afro1965" ? "bg-stone-900 text-yellow-300 font-bold" : "bg-yellow-500/20 text-yellow-300"
+              }`}>
+                5
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("oddmeter")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "oddmeter"
+                  ? "bg-cyan-500 text-stone-950 font-bold shadow-sm"
+                  : "text-cyan-300/80 hover:text-cyan-200"
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Odd Meters</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "oddmeter" ? "bg-stone-900 text-cyan-300 font-bold" : "bg-cyan-500/20 text-cyan-300"
+              }`}>
+                7
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("ambiences")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "ambiences"
+                  ? "bg-emerald-500 text-stone-950 font-bold shadow-sm"
+                  : "text-emerald-300/80 hover:text-emerald-200"
+              }`}
+            >
+              <Waves className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Studios & Ambiences</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "ambiences" ? "bg-stone-900 text-emerald-300 font-bold" : "bg-emerald-500/20 text-emerald-300"
+              }`}>
+                21
+              </span>
+            </button>
+            <button
+              onClick={() => onSelectView("breed")}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                currentView === "breed"
+                  ? "bg-purple-500 text-stone-950 font-bold shadow-sm"
+                  : "text-purple-300/80 hover:text-purple-200"
+              }`}
+            >
+              <Dna className="w-3.5 h-3.5 text-purple-400" />
+              <span>Breed Styles</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                currentView === "breed" ? "bg-stone-900 text-purple-300 font-bold" : "bg-purple-500/20 text-purple-300"
+              }`}>
+                Lab
               </span>
             </button>
             <button

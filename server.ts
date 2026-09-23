@@ -5,6 +5,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
 import { generateProceduralPrompt } from "./src/lib/proceduralPromptEngine";
 import { generateProceduralProtocolResponse } from "./src/lib/protocolAiEngine";
+import { generateProceduralStyleBreeding } from "./src/lib/styleBreederEngine";
 
 dotenv.config();
 
@@ -220,6 +221,106 @@ Provide output in JSON matching the exact schema specified.
     } catch {
       res.status(500).json({ error: "Failed to generate prompt. Please try again." });
     }
+  }
+});
+
+// API: Breed New Styles by Combining Existing Styles & Traditions
+app.post("/api/breed-styles", async (req, res) => {
+  const { parentA, parentB, ratio = 50, hybridMode = "harmonic_fusion", targetMeter, mutationFactor = 25, additionalDesires } = req.body;
+
+  let ai: GoogleGenAI | null = null;
+  try {
+    ai = getGeminiClient();
+  } catch (keyErr: any) {
+    console.warn("[Breed API] Gemini API key not present, using procedural style breeder engine.");
+    const fallback = generateProceduralStyleBreeding(req.body);
+    return res.json(fallback);
+  }
+
+  try {
+    const prompt = `You are an elite ethnomusicologist, sonic geneticist, and master Suno AI prompt engineer.
+Your task is to BREED a completely new, coherent musical hybrid style by cross-pollinating two parent styles.
+
+Parent A (${ratio}% influence):
+- Name: ${parentA.name}
+- Style Tags: ${parentA.styleTags}
+- Instrumentation: ${parentA.instrumentation}
+- Tempo / Meter: ${parentA.tempo || "N/A"} / ${parentA.meter || "N/A"}
+- Negative Exclusions: ${parentA.negativePrompt || "N/A"}
+
+Parent B (${100 - ratio}% influence):
+- Name: ${parentB.name}
+- Style Tags: ${parentB.styleTags}
+- Instrumentation: ${parentB.instrumentation}
+- Tempo / Meter: ${parentB.tempo || "N/A"} / ${parentB.meter || "N/A"}
+- Negative Exclusions: ${parentB.negativePrompt || "N/A"}
+
+Breeding Parameters:
+- Hybrid Architecture: ${hybridMode}
+- Target Meter / Cadence: ${targetMeter || "Intelligently synthesize from parents"}
+- Mutation Factor (0-100%): ${mutationFactor}% (introduce unexpected organic timbres, tape warmth, microtonal nuances)
+- Additional Desires: ${additionalDesires || "None specified"}
+
+Rules:
+1. Synthesize a pristine, concise styleTags string (STRICTLY UNDER 120 CHARACTERS) that captures the cross-breed without wordiness.
+2. Structure an evocative Suno arrangement prompt with bracketed tags ([Intro...], [Groove...], [Main...], [Break...], [Outro...]). If an odd meter is involved, include the count-in in the intro!
+3. Merge negative exclusions so neither parent's prohibited elements bleed into the child (e.g. ensure 'no vocals', 'no EDM', and horn exclusions if specified).
+4. Identify which traits came from Parent A, which from Parent B, and what novel mutations emerged.
+
+Respond with strict JSON adhering to this schema:
+{
+  "childTitle": "Evocative Title of the Child Style",
+  "hybridName": "Short descriptive name (e.g. Addis-Lagos Highlife Pocket)",
+  "geneticBreakdown": {
+    "inheritedFromA": ["tag 1", "instrument A"],
+    "inheritedFromB": ["tag 2", "instrument B"],
+    "mutations": ["novel sonic mutation 1", "mutation 2"]
+  },
+  "styleTags": "concise comma-separated tags under 120 chars",
+  "promptDescription": "Detailed overview of the bred hybrid lineage and timbre",
+  "tempoDesc": "e.g. 102 BPM (Hypnotic 7/8 pocket)",
+  "meter": "e.g. 7/8 or 3/4 or syncopated 10/8",
+  "arrangementPrompt": "[Intro: ...] [Groove: ...] [Main: ...] [Break: ...] [Outro: ...]",
+  "negativePrompt": "combined negative tags",
+  "tips": ["Breeding tip 1", "Performance instruction 2", "Suno quirk guidance 3"]
+}`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        temperature: 0.75,
+      }
+    });
+
+    const text = response.text;
+    if (!text) {
+      throw new Error("Empty response from AI");
+    }
+
+    const data = JSON.parse(text);
+
+    // Build suggestedConfig for instant Studio loading
+    data.suggestedConfig = {
+      subtheme: `Style Breed: ${data.childTitle}`,
+      genre: data.styleTags,
+      mood: `Hybrid Genetic Fusion (${ratio}% / ${100 - ratio}%), Analog Saturation`,
+      tempo: data.tempoDesc || "100 BPM",
+      vocalType: "Instrumental (No Vocals, [Instrumental])",
+      instruments: [...(data.geneticBreakdown?.inheritedFromA || []), ...(data.geneticBreakdown?.inheritedFromB || [])].join(", "),
+      structure: data.arrangementPrompt,
+      enableRoomTone: true,
+      roomTone: "analog tape hiss, close-mic room tone, warm valve compression",
+      negativePrompt: data.negativePrompt,
+      appendExclusionsToStyle: true
+    };
+
+    res.json(data);
+  } catch (err: any) {
+    console.warn("[Breed API] Failed AI breeding, invoking procedural fallback:", err.message);
+    const fallback = generateProceduralStyleBreeding(req.body);
+    res.json(fallback);
   }
 });
 

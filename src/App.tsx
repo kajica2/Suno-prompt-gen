@@ -11,11 +11,17 @@ import TrumpetSuite from "./components/TrumpetSuite";
 import ProtocolsSuite from "./components/ProtocolsSuite";
 import BuskingSuite from "./components/BuskingSuite";
 import BamBamSuite from "./components/BamBamSuite";
-import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame, Disc, Layers, Radio, Ban } from "lucide-react";
+import EthioJazzSuite from "./components/EthioJazzSuite";
+import Afro1965Suite from "./components/Afro1965Suite";
+import OddMeterSuite from "./components/OddMeterSuite";
+import StyleBreederSuite from "./components/StyleBreederSuite";
+import RecordingAmbiencesSuite from "./components/RecordingAmbiencesSuite";
+import FidelityLockSuite from "./components/FidelityLockSuite";
+import { Copy, Check, Sparkles, Music, Compass, BookOpen, Heart, Info, AlertCircle, ArrowRight, Edit3, Eye, RefreshCw, Feather, Flame, Disc, Layers, Radio, Ban, Clock, Dna, Waves, Building2, ShieldCheck, Lock } from "lucide-react";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<"protocols" | "studio" | "busking" | "bambam" | "harmonic" | "debussy" | "raga" | "trumpet">("protocols");
-  const [presetCategory, setPresetCategory] = useState<"all" | "bambam" | "busking" | "trumpet" | "raga" | "debussy" | "harmonic" | "other">("all");
+  const [currentView, setCurrentView] = useState<"protocols" | "fidelity" | "studio" | "busking" | "bambam" | "ethiojazz" | "afro1965" | "oddmeter" | "ambiences" | "breed" | "harmonic" | "debussy" | "raga" | "trumpet">("protocols");
+  const [presetCategory, setPresetCategory] = useState<"all" | "fidelity" | "hybridstudio" | "legendary" | "ambience" | "oddmeter" | "afro1965" | "ethiojazz" | "bambam" | "busking" | "trumpet" | "raga" | "debussy" | "harmonic" | "other">("all");
   const [config, setConfig] = useState<PromptConfig>(PRESETS[0].config);
   const [result, setResult] = useState<PromptResult | null>(PRESETS[0].sampleResult);
   const [isLoading, setIsLoading] = useState(false);
@@ -181,6 +187,17 @@ export default function App() {
               onSwitchToStudio={() => setCurrentView("studio")}
             />
           </main>
+        ) : currentView === "fidelity" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 md:px-10 relative z-10">
+            <FidelityLockSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
         ) : currentView === "harmonic" ? (
           <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
             <HarmonicStudyEngine
@@ -248,10 +265,246 @@ export default function App() {
               onSwitchToStudio={() => setCurrentView("studio")}
             />
           </main>
+        ) : currentView === "ethiojazz" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <EthioJazzSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
+        ) : currentView === "afro1965" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <Afro1965Suite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
+        ) : currentView === "oddmeter" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <OddMeterSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
+        ) : currentView === "ambiences" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <RecordingAmbiencesSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+              onOpenStyleBreeder={() => setCurrentView("breed")}
+            />
+          </main>
+        ) : currentView === "breed" ? (
+          <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-10 md:px-12 relative z-10">
+            <StyleBreederSuite
+              onApplyToStudio={(newConfig, newResult) => {
+                setConfig(newConfig);
+                setResult(newResult);
+                setError(null);
+              }}
+              onSwitchToStudio={() => setCurrentView("studio")}
+            />
+          </main>
         ) : (
           <>
             {/* Featured Unplugged & Fusion Suites Ribbons */}
-            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div className="max-w-7xl w-full mx-auto px-6 pt-6 md:px-12 relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-10 gap-4">
+              {/* Reference Lock & Fidelity Protocols Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-500/25 via-stone-900/90 to-stone-950 border border-indigo-500/50 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Reference Locks
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono font-semibold">
+                        10 Protocols
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Audio upload authority: absolute fidelity, seamless extends, vocal & mix locks.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("fidelity")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* Recording Studios & Impossible Hybrids Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/25 via-stone-900/90 to-stone-950 border border-purple-500/50 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0">
+                    <Dna className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Impossible Studios
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono font-semibold">
+                        7 Hybrids + 7 Studios
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Abbey Road, 30th St Church, Stax, Hansa & impossible contradictory rooms.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("ambiences")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* Breed Styles Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-500/25 via-stone-900/90 to-stone-950 border border-purple-500/50 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0">
+                    <Dna className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Breed Styles
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono font-semibold">
+                        Genetic Lab
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Cross-breed any 2 styles, blend ratios & mutate timbres.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("breed")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* Odd Meter Ethio-Jazz Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-cyan-500/25 via-stone-900/90 to-stone-950 border border-cyan-500/50 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shrink-0">
+                    <Clock className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Odd Meter Ethio-Jazz
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono font-semibold">
+                        7 Meters
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      7/8, 3/4, 9/8, 11/8, 10/8, 5/4, 13/8 with tri-stacked count-ins.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("oddmeter")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* 1965 Afro Rhythm Section Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-yellow-500/25 via-stone-900/90 to-stone-950 border border-yellow-500/50 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center text-yellow-300 shrink-0">
+                    <Radio className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        1965 Afro Rhythm
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 font-mono font-semibold">
+                        5 Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Rhythm section only: Lagos, Addis, Accra, Havana & Afro-Soul.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("afro1965")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {/* Ethio-Jazz Suite Ribbon */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/25 via-stone-900/90 to-stone-950 border border-amber-500/50 flex items-center justify-between gap-3 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0">
+                    <Disc className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-serif font-bold text-white tracking-wide">
+                        Ethio-Jazz Suite
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-semibold">
+                        5 Prompts
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-300 font-light mt-0.5">
+                      Mulatu Astatke modal grooves, vibraphone lead & strict horn exclusions.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setCurrentView("ethiojazz")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-mono text-xs font-bold transition-all shrink-0 cursor-pointer shadow"
+                >
+                  <span>Open</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
               {/* Bam Bam Jamm Suite Ribbon */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/20 via-stone-900/90 to-stone-950 border border-orange-500/40 flex items-center justify-between gap-3 shadow-xl">
                 <div className="flex items-center gap-3">
@@ -447,6 +700,8 @@ export default function App() {
                   onSubmit={handleGenerate}
                   isLoading={isLoading}
                   onOpenHarmonicEngine={() => setCurrentView("harmonic")}
+                  onOpenStyleBreeder={() => setCurrentView("breed")}
+                  onOpenAmbiences={() => setCurrentView("ambiences")}
                 />
 
             {/* Suno limits card */}
@@ -911,6 +1166,76 @@ export default function App() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setPresetCategory("fidelity")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "fidelity" ? "bg-indigo-600 text-white font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-300" />
+                  <span>Reference Locks (10)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("hybridstudio")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "hybridstudio" ? "bg-purple-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Dna className="w-3.5 h-3.5 text-purple-300" />
+                  <span>Impossible Hybrids (7)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("legendary")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "legendary" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Legendary Studios (7)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("ambience")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "ambience" ? "bg-emerald-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Waves className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Physical Spaces (7)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("oddmeter")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "oddmeter" ? "bg-cyan-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Odd Meters (7)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("afro1965")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "afro1965" ? "bg-yellow-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Radio className="w-3.5 h-3.5 text-yellow-300" />
+                  <span>1965 Afro Rhythm (5)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresetCategory("ethiojazz")}
+                  className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                    presetCategory === "ethiojazz" ? "bg-amber-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  <Disc className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Ethio-Jazz (5)</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setPresetCategory("bambam")}
                   className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
                     presetCategory === "bambam" ? "bg-orange-500 text-stone-950 font-bold" : "text-white/60 hover:text-white"
@@ -973,6 +1298,13 @@ export default function App() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
               {PRESETS.filter((preset) => {
+                if (presetCategory === "fidelity") return preset.id.startsWith("fidelity");
+                if (presetCategory === "hybridstudio") return preset.id.startsWith("hybridstudio");
+                if (presetCategory === "legendary") return preset.id.startsWith("legendary");
+                if (presetCategory === "ambience") return preset.id.startsWith("ambience");
+                if (presetCategory === "oddmeter") return preset.id.startsWith("oddmeter");
+                if (presetCategory === "afro1965") return preset.id.startsWith("afro1965");
+                if (presetCategory === "ethiojazz") return preset.id.startsWith("ethiojazz");
                 if (presetCategory === "bambam") return preset.id.startsWith("bambam");
                 if (presetCategory === "busking") return preset.id.startsWith("busking");
                 if (presetCategory === "trumpet") return preset.id.startsWith("trumpet");
