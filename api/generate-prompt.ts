@@ -1,4 +1,4 @@
-import { handleGeneratePrompt } from "../src/server/handlers";
+import { handleGeneratePrompt } from "../src/server/handlers.js";
 
 /**
  * Vercel serverless function: POST /api/generate-prompt

@@ -1,4 +1,4 @@
-import { handleProtocolDialogue } from "../src/server/handlers";
+import { handleProtocolDialogue } from "../src/server/handlers.js";
 
 /**
  * Vercel serverless function: POST /api/protocol-dialogue

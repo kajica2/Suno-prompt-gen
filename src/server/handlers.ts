@@ -1,15 +1,15 @@
 import { Type } from "@google/genai";
-import { generateProceduralPrompt } from "../lib/proceduralPromptEngine";
-import { generateProceduralStyleBreeding } from "../lib/styleBreederEngine";
-import { generateProceduralProtocolResponse } from "../lib/protocolAiEngine";
-import { getGeminiClient } from "./gemini";
+import { generateProceduralPrompt } from "../lib/proceduralPromptEngine.js";
+import { generateProceduralStyleBreeding } from "../lib/styleBreederEngine.js";
+import { generateProceduralProtocolResponse } from "../lib/protocolAiEngine.js";
+import { getGeminiClient } from "./gemini.js";
 import {
   GENERATE_SYSTEM_INSTRUCTION,
   buildBreedPrompt,
   buildGenerateUserPrompt,
   buildProtocolContents,
   buildProtocolSystemInstruction,
-} from "./prompts";
+} from "./prompts.js";
 
 /**
  * The three API operations, as plain request-shaped -> response-shaped
