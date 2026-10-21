@@ -146,7 +146,8 @@ export default function StyleBreederSuite({ onApplyToStudio, onSwitchToStudio }:
         `Lineage: ${ratio}% ${getParentData(selectedParentAId).name} × ${100 - ratio}% ${getParentData(selectedParentBId).name}`,
         ...breedingResult.tips
       ],
-      isFallback: breedingResult.isFallback
+      isFallback: breedingResult.isFallback,
+      engine: breedingResult.engine
     };
 
     onApplyToStudio(config, result);

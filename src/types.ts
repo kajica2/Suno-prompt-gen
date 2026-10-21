@@ -21,6 +21,8 @@ export interface PromptResult {
   isFallback?: boolean;
   fallbackReason?: string;
   negativePrompt?: string;
+  /** Which engine answered: "gemini", "free" or absent for the local engine. */
+  engine?: string;
 }
 
 export interface Preset {
@@ -68,5 +70,7 @@ export interface BreedStylesResult {
   suggestedConfig: PromptConfig;
   tips: string[];
   isFallback?: boolean;
+  /** Which engine answered: "gemini", "free" or absent for the local engine. */
+  engine?: string;
 }
 
