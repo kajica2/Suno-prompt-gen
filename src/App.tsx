@@ -811,6 +811,11 @@ export default function App() {
                             Harmonic Engine
                           </span>
                         )}
+                        {result.engine === "free" && (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[9px] uppercase tracking-wider font-semibold">
+                            Free AI
+                          </span>
+                        )}
                       </div>
                       <h2 className="font-serif text-3xl md:text-4xl italic font-medium text-white tracking-tight mt-1">
                         {result.title}
